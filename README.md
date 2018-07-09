@@ -1,2 +1,2 @@
-# kasa
-a type script language
+# kasa, by realxie
+a type script language.
