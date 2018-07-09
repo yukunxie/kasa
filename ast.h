@@ -2,6 +2,7 @@
 #define __AST_H__
 
 #include <string>
+#include <vector>
 
 class AST
 {
@@ -18,7 +19,6 @@ public:
 	{}
 	ASTIdentifier(const std::string&& value): m_sValue(value)
 	{}
-	~ASTIdentifier(){};
 };
 
 class ASTInteger: public AST
@@ -30,7 +30,6 @@ public:
 	{}
 	ASTInteger(const int&& value): m_iValue(value)
 	{}
-	~ASTInteger(){};
 };
 
 class ASTDecimal: public AST
@@ -42,7 +41,6 @@ public:
 	{}
 	ASTDecimal(const double&& value): m_fValue(value)
 	{}
-	~ASTDecimal(){};
 };
 
 class ASTAssignment: public AST
@@ -55,7 +53,6 @@ public:
 		m_left(left), 
 		m_right(right)
 	{}
-	~ASTAssignment(){};
 };
 
 class ASTBinaryOp: public AST
@@ -70,8 +67,22 @@ public:
 		m_left(left), 
 		m_right(right)
 	{}
-	~ASTBinaryOp(){};
 };
+
+class ASTBlock: public AST
+{
+private:
+	std::vector<const AST*> m_block;
+public:
+	ASTBinaryOp()
+	{}
+	
+	void pushBack(const AST* node)
+	{
+		m_block.push_back(node);
+	}
+};
+
 
 #endif
 
