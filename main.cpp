@@ -9,7 +9,13 @@
 #include "ast.h"
 using namespace std;
 
+extern int yyparse();
+extern ASTBlock *programBlock;
 int main()
 {
+    cout << programBlock << endl;
+    yyparse();
+    cout << programBlock << endl;
+    delete programBlock;
 	return 0;
 }

@@ -1,13 +1,20 @@
-﻿#ifndef __AST_H__
+#ifndef __AST_H__
 #define __AST_H__
 
 #include <string>
 #include <vector>
+#include <iostream>
 
 class AST
 {
 public:
 	virtual ~AST(){};
+};
+
+class ASTExpression : public AST {
+};
+
+class ASTStatement : public AST {
 };
 
 class ASTIdentifier: public AST
@@ -21,7 +28,7 @@ public:
 	{}
 };
 
-class ASTInteger: public AST
+class ASTInteger: public ASTExpression
 {
 private:
 	const int m_iValue;
@@ -32,7 +39,7 @@ public:
 	{}
 };
 
-class ASTDecimal: public AST
+class ASTDecimal: public ASTExpression
 {
 private:
 	const double m_fValue;
@@ -43,7 +50,7 @@ public:
 	{}
 };
 
-class ASTAssignment: public AST
+class ASTAssignment: public ASTExpression
 {
 private:
 	const AST* m_left;
@@ -55,34 +62,47 @@ public:
 	{}
 };
 
-class ASTBinaryOp: public AST
+class ASTBinaryOp: public ASTExpression
 {
 private:
-	unsigned char m_op;
+	int m_op;
 	const AST* m_left;
 	const AST* m_right;
 public:
-	ASTBinaryOp(unsigned char op, const AST* left, const AST* right):
+	ASTBinaryOp(int op, const AST* left, const AST* right):
 		m_op(op),
 		m_left(left), 
 		m_right(right)
 	{}
 };
 
-class ASTBlock: public AST
+class ASTBlock: public ASTExpression
 {
 private:
 	std::vector<const AST*> m_block;
 public:
-	ASTBinaryOp()
+	ASTBlock()
 	{}
 	
 	void pushBack(const AST* node)
 	{
 		m_block.push_back(node);
 	}
+
+	~ASTBlock()
+	{
+		std::cout << m_block.size() << std::endl;
+	}
 };
 
+class ASTExpressionStatement : public ASTStatement 
+{
+private:
+	const ASTExpression* m_expression;
+public:
+	ASTExpressionStatement(const ASTExpression* expression) : 
+		m_expression(expression) 
+	{ }
+};
 
 #endif
-
