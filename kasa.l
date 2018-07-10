@@ -72,6 +72,7 @@ void saveLocation()
 "-"		          				return TOKEN(TMINUS);
 "*"		          				return TOKEN(TMUL);
 "/"				          		return TOKEN(TDIV);
+";"								return TOKEN(TEXPREND);
 
 .                       printf("Unknown token!\n"); yyterminate();
 

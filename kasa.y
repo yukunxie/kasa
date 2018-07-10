@@ -53,6 +53,7 @@
 %token <token> TPLUS TMINUS TMUL TDIV
 %token <token> TRETURN TEXTERN
 %token <token> TFOR TWHILE TIF TELSE
+%token <token> TEXPREND
 
 /* Define the type of node our nonterminal symbols represent.
    The types refer to the %union declaration above. Ex: when
@@ -80,7 +81,7 @@ stmts : stmt { $$ = new ASTBlock(); $$->pushBack($<stmt>1); }
 	  	| stmts stmt { $1->pushBack($<stmt>2); }
 		;
 
-stmt : expr { $$ = new ASTExpressionStatement($1); }
+stmt : expr TEXPREND { $$ = new ASTExpressionStatement($1); }
 		;
 
 block : TLBRACE stmts TRBRACE { $$ = $2; }

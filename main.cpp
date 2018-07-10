@@ -9,13 +9,20 @@
 #include "ast.h"
 using namespace std;
 
+typedef struct yy_buffer_state * YY_BUFFER_STATE;
 extern int yyparse();
+extern YY_BUFFER_STATE yy_scan_string (const char *yy_str  );
+extern void yy_delete_buffer(YY_BUFFER_STATE buffer);
+
 extern ASTBlock *programBlock;
 int main()
 {
-    cout << programBlock << endl;
+    char string[] = "id = 10 + 999;";
+    YY_BUFFER_STATE buffer = yy_scan_string(string);
     yyparse();
-    cout << programBlock << endl;
+    yy_delete_buffer(buffer);
+
+    programBlock->outputDebug();
     delete programBlock;
 	return 0;
 }
