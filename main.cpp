@@ -8,6 +8,7 @@
 #include <string>
 #include<iostream>
 #include "ast.h"
+#include "object.h"
 using namespace std;
 
 typedef struct yy_buffer_state * YY_BUFFER_STATE;
@@ -18,6 +19,10 @@ extern void yy_delete_buffer(YY_BUFFER_STATE buffer);
 extern ASTModule *programBlock;
 int main()
 {
+    ObjectString a("123");
+    ObjectString b("123 " );
+    cout << "eq " << (a.cmpEQ(&b)) << endl;
+
     std::ifstream ifs("test.ks");
     std::string content( (std::istreambuf_iterator<char>(ifs) ), (std::istreambuf_iterator<char>()));
 

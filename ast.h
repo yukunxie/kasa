@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include "object.h"
 
 #define DEBUG_OUTPUT 1
 
