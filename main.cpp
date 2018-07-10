@@ -17,7 +17,7 @@ extern void yy_delete_buffer(YY_BUFFER_STATE buffer);
 extern ASTBlock *programBlock;
 int main()
 {
-    char string[] = "id = 10 + 999;";
+    char string[] = "{a = (b); c = a + b;}";
     YY_BUFFER_STATE buffer = yy_scan_string(string);
     yyparse();
     yy_delete_buffer(buffer);

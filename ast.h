@@ -41,7 +41,7 @@ class ASTExpression : public AST {
 class ASTStatement : public AST {
 };
 
-class ASTIdentifier: public AST
+class ASTIdentifier: public ASTExpression
 {
 public:
 	ASTIdentifier(const std::string& value): m_value(value)

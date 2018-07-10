@@ -61,7 +61,7 @@
    calling an (NIdentifier*). It makes the compiler happy.
  */
 %type <ident> ident
-%type <expr> numeric expr 
+%type <expr> numeric expr id_or_expr 
 %type <block> program stmts block
 %type <stmt> stmt 
 %type <token> comparison
@@ -75,6 +75,7 @@
 %%
 
 program : stmts { programBlock = $1; }
+		| block { programBlock = $1; }
 		;
 		
 stmts : stmt { $$ = new ASTBlock(); $$->pushBack($<stmt>1); }
@@ -94,15 +95,19 @@ ident : TIDENTIFIER { $$ = new ASTIdentifier(*$1); delete $1; }
 numeric : TINTEGER { $$ = new ASTInteger(atoi($1->c_str())); delete $1; }
 		| TDOUBLE { $$ = new ASTDecimal(atof($1->c_str())); delete $1; }
 		;
+
+id_or_expr : expr { $$ = $1; }
+		| ident  { $$ = $1; }
+		;
 	
 expr : ident TEQUAL expr { $$ = new ASTAssignment($<ident>1, $3); }
 	 	| numeric
-        | expr TMUL expr { $$ = new ASTBinaryOp($2, $1, $3); }
-        | expr TDIV expr { $$ = new	ASTBinaryOp($2, $1, $3); }
-        | expr TPLUS expr { $$ = new ASTBinaryOp($2, $1, $3); }
-        | expr TMINUS expr { $$ = new ASTBinaryOp($2, $1, $3); }
- 	 	| expr comparison expr { $$ = new ASTBinaryOp($2, $1, $3); }
-     	| '(' expr ')' { $$ = $2; }
+        | id_or_expr TMUL id_or_expr { $$ = new ASTBinaryOp($2, $1, $3); }
+        | id_or_expr TDIV id_or_expr { $$ = new	ASTBinaryOp($2, $1, $3); }
+        | id_or_expr TPLUS id_or_expr { $$ = new ASTBinaryOp($2, $1, $3); }
+        | id_or_expr TMINUS id_or_expr { $$ = new ASTBinaryOp($2, $1, $3); }
+ 	 	| id_or_expr comparison id_or_expr { $$ = new ASTBinaryOp($2, $1, $3); }
+     	| '(' id_or_expr ')' { $$ = $2; }
 	 	;
 
 comparison : TCEQ 
