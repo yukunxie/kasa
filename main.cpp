@@ -4,7 +4,8 @@
     > Mail: ma6174@163.com 
     > Created Time: 2018年07月09日 星期一 17时07分21秒
  ************************************************************************/
-
+#include <fstream>
+#include <string>
 #include<iostream>
 #include "ast.h"
 using namespace std;
@@ -17,8 +18,11 @@ extern void yy_delete_buffer(YY_BUFFER_STATE buffer);
 extern ASTBlock *programBlock;
 int main()
 {
-    char string[] = "{a = (b); c = a + b;}";
-    YY_BUFFER_STATE buffer = yy_scan_string(string);
+    std::ifstream ifs("test.ks");
+    std::string content( (std::istreambuf_iterator<char>(ifs) ), (std::istreambuf_iterator<char>()));
+    
+    //char string[] = "{a = (b / 10); c = a + b;}";
+    YY_BUFFER_STATE buffer = yy_scan_string(content.c_str());
     yyparse();
     yy_delete_buffer(buffer);
 

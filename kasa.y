@@ -35,7 +35,7 @@
 	AST *ast;
 	ASTBlock *block;
 	ASTExpression *expr;
-	ASTStatement *stmt;
+	ASTExpression *stmt;
 	ASTIdentifier *ident;
 	std::vector<ASTIdentifier*> *varvec;
 	std::vector<ASTExpression*> *exprvec;
@@ -83,6 +83,7 @@ stmts : stmt { $$ = new ASTBlock(); $$->pushBack($<stmt>1); }
 		;
 
 stmt : expr TEXPREND { $$ = new ASTExpressionStatement($1); }
+		| block {$$ = $1;}
 		;
 
 block : TLBRACE stmts TRBRACE { $$ = $2; }

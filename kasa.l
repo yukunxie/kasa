@@ -41,7 +41,7 @@ void saveLocation()
 
 #.*\n							{yylineno += 1; yycolumn = 0;};
 [\n]							{yylineno += 1; yycolumn = 0;};
-[ \t]					        ;
+[ \t|\r]					    ;
 "extern"                        return TOKEN(TEXTERN);
 "return"				        return TOKEN(TRETURN);
 "for"							return TOKEN(TFOR);

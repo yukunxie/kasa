@@ -218,7 +218,7 @@ private:
 	std::vector<const AST*> m_block;
 };
 
-class ASTExpressionStatement : public ASTStatement 
+class ASTExpressionStatement : public ASTExpression 
 {
 public:
 	virtual void debug() const
