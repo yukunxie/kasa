@@ -4,7 +4,7 @@
     #include <cstdlib>
 	#include <iostream>
 	
-	ASTBlock *programBlock = nullptr; /* the top level root node of our final AST */
+	ASTModule *programBlock = new ASTModule(); /* the top level root node of our final AST */
 
 	extern int yylex();
 	extern int yycolumn;
@@ -33,7 +33,7 @@
 /* Represents the many different ways we can access our data */
 %union {
 	AST *ast;
-	ASTBlock *block;
+	ASTChunk *chunk;
 	ASTExpression *expr;
 	ASTExpression *stmt;
 	ASTIdentifier *ident;
@@ -62,7 +62,7 @@
  */
 %type <ident> ident
 %type <expr> numeric expr id_or_expr 
-%type <block> program stmts block
+%type <chunk> program stmts chunk
 %type <stmt> stmt 
 %type <token> comparison
 
@@ -74,20 +74,20 @@
 
 %%
 
-program : stmts { programBlock = $1; }
-		| block { programBlock = $1; }
+program : stmts {programBlock->pushBack($1); }
+		//| chunk { programBlock = $1; }
 		;
 		
-stmts : stmt { $$ = new ASTBlock(); $$->pushBack($<stmt>1); }
+stmts : stmt { $$ = new ASTChunk(); $$->pushBack($<stmt>1); }
 	  	| stmts stmt { $1->pushBack($<stmt>2); }
 		;
 
 stmt : expr TEXPREND { $$ = new ASTExpressionStatement($1); }
-		| block {$$ = $1;}
+		| chunk {$$ = $1;}
 		;
 
-block : TLBRACE stmts TRBRACE { $$ = $2; }
-	  	| TLBRACE TRBRACE { $$ = new ASTBlock(); }
+chunk : TLBRACE stmts TRBRACE { $$ = $2; }
+	  	| TLBRACE TRBRACE { $$ = new ASTChunk(); }
 	  	;
 
 ident : TIDENTIFIER { $$ = new ASTIdentifier(*$1); delete $1; }
@@ -101,7 +101,7 @@ id_or_expr : expr { $$ = $1; }
 		| ident  { $$ = $1; }
 		;
 	
-expr : ident TEQUAL expr { $$ = new ASTAssignment($<ident>1, $3); }
+expr : ident TEQUAL id_or_expr { $$ = new ASTAssignment($<ident>1, $3); }
 	 	| numeric
         | id_or_expr TMUL id_or_expr { $$ = new ASTBinaryOp($2, $1, $3); }
         | id_or_expr TDIV id_or_expr { $$ = new	ASTBinaryOp($2, $1, $3); }

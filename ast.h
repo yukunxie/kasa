@@ -12,6 +12,9 @@
 
 #define DEBUG_OUTPUT 1
 
+class ASTBlock;
+class ASTChunk;
+
 class AST
 {	
 public:
@@ -60,7 +63,7 @@ public:
 		std::cout << getTypeName() << " : " << m_value << std::endl;
 	}
 
-private:
+protected:
 	const std::string m_value;
 };
 
@@ -83,7 +86,7 @@ public:
 		std::cout << getTypeName() << " : " << m_value << std::endl;
 	}
 
-private:
+protected:
 	const int m_value;
 };
 
@@ -106,7 +109,7 @@ public:
 		std::cout << getTypeName() << " : " << m_value << std::endl;
 	}
 
-private:
+protected:
 	const double m_value;
 };
 
@@ -129,7 +132,7 @@ public:
 	}
 
 
-private:
+protected:
 	const std::string m_value;
 };
 
@@ -154,7 +157,7 @@ public:
 		m_right->debug();
 	}
 
-private:
+protected:
 	const AST* m_left;
 	const AST* m_right;
 };
@@ -182,23 +185,71 @@ public:
 		m_right->debug();
 	}
 
-private:
+protected:
 	int m_op;
 	const AST* m_left;
 	const AST* m_right;
 };
 
-class ASTBlock: public ASTExpression
+/**
+ * a code block in a block
+*/
+class ASTChunk: public ASTExpression
+{
+public:
+	ASTChunk()
+	{
+	}
+
+	~ASTChunk();
+	
+	void pushBack(const ASTExpression* node)
+	{
+		m_expressions.push_back(node);
+	}
+
+	virtual std::string getTypeName() const
+	{
+		return "ASTChunk";
+	}
+
+	virtual void debug() const
+	{
+		// std::cout << "chunk expression size:" << m_expressions.size() << std::endl;
+		// for (auto it : m_expressions)
+		// {
+		// 	std::cout << "ttttt: " << it->getTypeName() << std::endl;
+		// }
+		// std::cout << "xxxxxxxxxxxxxxxxxx" << std::endl;
+
+		for (auto it : m_expressions)
+		{
+			it->debug();
+		}
+		
+	}
+
+protected:
+	std::vector<const AST*> m_expressions;
+};
+
+class ASTBlock: public AST
 {
 public:
 	ASTBlock()
 	{}
 
-	~ASTBlock();
-	
-	void pushBack(const AST* node)
+	~ASTBlock()
 	{
-		m_block.push_back(node);
+		for (auto it : m_chunks)
+		{
+			delete it;
+		}
+	};
+	
+	void pushBack(const ASTChunk* chunk)
+	{
+		m_chunks.push_back(chunk);
 	}
 
 	virtual std::string getTypeName() const
@@ -208,14 +259,53 @@ public:
 
 	virtual void debug() const
 	{
-		for (auto it : m_block)
+		std::cout << "chunk size:" << m_chunks.size() << std::endl;
+
+		for (auto it : m_chunks)
 		{
 			it->debug();
 		}
 	}
 
-private:
-	std::vector<const AST*> m_block;
+	ASTBlock* getParentBlock()
+	{
+		return m_parentBlock;
+	}
+
+	void setParentBlock(ASTBlock* block)
+	{
+		m_parentBlock = block;
+	}
+
+	int getVariableIndex(const std::string& name)
+	{
+		for (size_t i = 0, size = m_variables.size(); i < size; ++i)
+		{
+			if (m_variables[i] == name)
+			{
+				return (int)i;
+			}
+		}
+		return -1;
+	}
+
+	int addVariable(const std::string& name, const AST* variable)
+	{
+		for (size_t i = 0, size = m_variables.size(); i < size; ++i)
+		{
+			if (m_variables[i] == name)
+			{
+				return i;
+			}
+		}
+		m_variables.emplace_back(name);
+		return (int)m_variables.size() - 1;
+	}
+
+protected:
+	std::vector<const ASTChunk*> m_chunks;
+	ASTBlock* m_parentBlock;
+	std::vector<std::string> m_variables;
 };
 
 class ASTExpressionStatement : public ASTExpression 
@@ -236,8 +326,22 @@ public:
 		return "ASTExpressionStatement";
 	}
 
-private:
+protected:
 	const ASTExpression* m_expression;
+};
+
+/**
+ * module is a file.
+*/
+class ASTModule: public ASTBlock
+{
+public:
+	ASTModule()
+	{}
+
+	~ASTModule()
+	{
+	};
 };
 
 #endif

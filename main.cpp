@@ -15,12 +15,12 @@ extern int yyparse();
 extern YY_BUFFER_STATE yy_scan_string (const char *yy_str  );
 extern void yy_delete_buffer(YY_BUFFER_STATE buffer);
 
-extern ASTBlock *programBlock;
+extern ASTModule *programBlock;
 int main()
 {
     std::ifstream ifs("test.ks");
     std::string content( (std::istreambuf_iterator<char>(ifs) ), (std::istreambuf_iterator<char>()));
-    
+
     //char string[] = "{a = (b / 10); c = a + b;}";
     YY_BUFFER_STATE buffer = yy_scan_string(content.c_str());
     yyparse();

@@ -27,13 +27,13 @@ ASTAssignment::~ASTAssignment()
     m_right = nullptr;
 }
 
-ASTBlock::~ASTBlock()
+ASTChunk::~ASTChunk()
 {
-    for (auto it : m_block)
+    for (auto it : m_expressions)
     {
         delete it;
     }
-    m_block.clear();
+    m_expressions.clear();
 }
 
 
