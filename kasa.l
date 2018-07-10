@@ -29,7 +29,7 @@ void saveLocation()
 	yylloc.first_column = yycolumn;
 	yylloc.last_column = yycolumn + yyleng - 1;
 	yycolumn += yyleng;
-	printf("%d, %d\n", yylineno, yycolumn);
+	//printf("%d, %d\n", yylineno, yycolumn);
 }
 #define YY_USER_ACTION saveLocation();
 
@@ -49,8 +49,8 @@ void saveLocation()
 "if"							return TOKEN(TIF);
 "else"							return TOKEN(TELSE);
 [a-zA-Z_][a-zA-Z0-9_]*  SAVE_TOKEN; return TIDENTIFIER;
-[0-9]+\.[0-9]* 			    SAVE_TOKEN; return TDOUBLE;
-[0-9]+					        SAVE_TOKEN; return TINTEGER;
+[+|-]?[0-9]+\.[0-9]* 			    SAVE_TOKEN; return TDOUBLE;
+[+|-]?[0-9]+					        SAVE_TOKEN; return TINTEGER;
 
 "="						        return TOKEN(TEQUAL);
 "=="				          	return TOKEN(TCEQ);
