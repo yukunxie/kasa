@@ -26,7 +26,7 @@ int main()
     yyparse();
     yy_delete_buffer(buffer);
 
-    programBlock->outputDebug();
+    programBlock->processVariableList(nullptr);
     delete programBlock;
 	return 0;
 }

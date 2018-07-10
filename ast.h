@@ -22,19 +22,23 @@ public:
 	{
 	}
 
-	virtual std::string getTypeName() const
+	virtual std::string getTypeName() 
 	{
 		return "AST";
 	}
 
-	virtual void debug() const
+	virtual void debug() 
 	{}
 	
-	void outputDebug() const
+	void outputDebug() 
 	{
 #if DEBUG_OUTPUT
 		debug();
 #endif 
+	}
+
+	virtual void processVariableList(ASTBlock * block)
+	{
 	}
 };
 
@@ -47,137 +51,146 @@ class ASTStatement : public AST {
 class ASTIdentifier: public ASTExpression
 {
 public:
-	ASTIdentifier(const std::string& value): m_value(value)
+	ASTIdentifier( std::string& value): m_value(value)
 	{}
-	ASTIdentifier(const std::string&& value): m_value(value)
+	ASTIdentifier( std::string&& value): m_value(value)
 	{}
 	~ASTIdentifier();
 
-	virtual std::string getTypeName() const
+	virtual std::string getTypeName() 
 	{
 		return "ASTIdentifier";
 	}
 
-	virtual void debug() const
+	virtual void debug() 
 	{
 		std::cout << getTypeName() << " : " << m_value << std::endl;
 	}
 
+	virtual void processVariableList(ASTBlock * block);
+
 protected:
-	const std::string m_value;
+	 std::string m_value;
+	int m_variableIndex = -1;
 };
 
 class ASTInteger: public ASTExpression
 {
 public:
-	ASTInteger(const int& value): m_value(value)
+	ASTInteger( int& value): m_value(value)
 	{}
-	ASTInteger(const int&& value): m_value(value)
+	ASTInteger( int&& value): m_value(value)
 	{}
 	~ASTInteger();
 
-	virtual std::string getTypeName() const
+	virtual std::string getTypeName() 
 	{
 		return "ASTInteger";
 	}
 
-	virtual void debug() const
+	virtual void debug() 
 	{
 		std::cout << getTypeName() << " : " << m_value << std::endl;
 	}
 
+	virtual void processVariableList(ASTBlock * block);
+
 protected:
-	const int m_value;
+	 int m_value;
 };
 
 class ASTDecimal: public ASTExpression
 {
 public:
-	ASTDecimal(const double& value): m_value(value)
+	ASTDecimal( double& value): m_value(value)
 	{}
-	ASTDecimal(const double&& value): m_value(value)
+	ASTDecimal( double&& value): m_value(value)
 	{}
 	~ASTDecimal();
 
-	virtual std::string getTypeName() const
+	virtual std::string getTypeName() 
 	{
 		return "ASTDecimal";
 	}
 
-	virtual void debug() const
+	virtual void debug() 
 	{
 		std::cout << getTypeName() << " : " << m_value << std::endl;
 	}
 
+	virtual void processVariableList(ASTBlock * block);
+
 protected:
-	const double m_value;
+	 double m_value;
 };
 
 class ASTString: public ASTExpression
 {
 public:
-	ASTString(const std::string& value): m_value(value)
+	ASTString( std::string& value): m_value(value)
 	{}
-	ASTString(const std::string&& value): m_value(value)
+	ASTString( std::string&& value): m_value(value)
 	{}
 
-	virtual std::string getTypeName() const
+	virtual std::string getTypeName() 
 	{
 		return "ASTString";
 	}
 
-	virtual void debug() const
+	virtual void debug() 
 	{
 		std::cout << getTypeName() << " : " << m_value << std::endl;
 	}
 
 
 protected:
-	const std::string m_value;
+	 std::string m_value;
 };
 
 class ASTAssignment: public ASTExpression
 {	
 public:
-	ASTAssignment(const AST* left, const AST* right):
+	ASTAssignment( AST* left,  AST* right):
 		m_left(left), 
 		m_right(right)
 	{}
 	~ASTAssignment();
 
-	virtual std::string getTypeName() const
+	virtual std::string getTypeName() 
 	{
 		return "ASTAssignment";
 	}
 
-	virtual void debug() const
+	virtual void debug() 
 	{
 		std::cout << getTypeName() << " >>> "<< std::endl;
 		m_left->debug();
 		m_right->debug();
 	}
 
+	virtual void processVariableList(ASTBlock * block);
+
 protected:
-	const AST* m_left;
-	const AST* m_right;
+	 AST* m_left;
+	 AST* m_right;
 };
 
 class ASTBinaryOp: public ASTExpression
 {
 public:
-	ASTBinaryOp(int op, const AST* left, const AST* right):
+	ASTBinaryOp(int op,  AST* left,  AST* right):
 		m_op(op),
 		m_left(left), 
 		m_right(right)
 	{}
 	~ASTBinaryOp();
 
-	virtual std::string getTypeName() const
+	virtual std::string getTypeName() 
 	{
 		return "ASTBinaryOp";
 	}
 
-	virtual void debug() const
+	virtual void debug() 
 	{
 		std::cout << getTypeName() << " >>> " << std::endl; 
 		m_left->debug();
@@ -185,10 +198,12 @@ public:
 		m_right->debug();
 	}
 
+	virtual void processVariableList(ASTBlock * block);
+
 protected:
 	int m_op;
-	const AST* m_left;
-	const AST* m_right;
+	 AST* m_left;
+	 AST* m_right;
 };
 
 /**
@@ -203,25 +218,18 @@ public:
 
 	~ASTChunk();
 	
-	void pushBack(const ASTExpression* node)
+	void pushBack( ASTExpression* node)
 	{
 		m_expressions.push_back(node);
 	}
 
-	virtual std::string getTypeName() const
+	virtual std::string getTypeName() 
 	{
 		return "ASTChunk";
 	}
 
-	virtual void debug() const
+	virtual void debug() 
 	{
-		// std::cout << "chunk expression size:" << m_expressions.size() << std::endl;
-		// for (auto it : m_expressions)
-		// {
-		// 	std::cout << "ttttt: " << it->getTypeName() << std::endl;
-		// }
-		// std::cout << "xxxxxxxxxxxxxxxxxx" << std::endl;
-
 		for (auto it : m_expressions)
 		{
 			it->debug();
@@ -229,8 +237,10 @@ public:
 		
 	}
 
+	virtual void processVariableList(ASTBlock * block);
+
 protected:
-	std::vector<const AST*> m_expressions;
+	std::vector<AST*> m_expressions;
 };
 
 class ASTBlock: public AST
@@ -247,20 +257,18 @@ public:
 		}
 	};
 	
-	void pushBack(const ASTChunk* chunk)
+	void pushBack(ASTChunk* chunk)
 	{
 		m_chunks.push_back(chunk);
 	}
 
-	virtual std::string getTypeName() const
+	virtual std::string getTypeName() 
 	{
 		return "ASTBlock";
 	}
 
-	virtual void debug() const
+	virtual void debug() 
 	{
-		std::cout << "chunk size:" << m_chunks.size() << std::endl;
-
 		for (auto it : m_chunks)
 		{
 			it->debug();
@@ -277,7 +285,7 @@ public:
 		m_parentBlock = block;
 	}
 
-	int getVariableIndex(const std::string& name)
+	int getVariableIndex( std::string& name)
 	{
 		for (size_t i = 0, size = m_variables.size(); i < size; ++i)
 		{
@@ -289,7 +297,7 @@ public:
 		return -1;
 	}
 
-	int addVariable(const std::string& name, const AST* variable)
+	int addVariable( std::string& name)
 	{
 		for (size_t i = 0, size = m_variables.size(); i < size; ++i)
 		{
@@ -302,8 +310,16 @@ public:
 		return (int)m_variables.size() - 1;
 	}
 
+	virtual void processVariableList(ASTBlock * block) 
+	{
+		for (auto it : m_chunks)
+		{
+			it->processVariableList(this);
+		}
+	}
+
 protected:
-	std::vector<const ASTChunk*> m_chunks;
+	std::vector<ASTChunk*> m_chunks;
 	ASTBlock* m_parentBlock;
 	std::vector<std::string> m_variables;
 };
@@ -311,23 +327,25 @@ protected:
 class ASTExpressionStatement : public ASTExpression 
 {
 public:
-	virtual void debug() const
+	virtual void debug() 
 	{
 		m_expression->debug();
 	}
 
-	ASTExpressionStatement(const ASTExpression* expression) : 
+	ASTExpressionStatement( ASTExpression* expression) : 
 		m_expression(expression) 
 	{ }
 	~ASTExpressionStatement();
 
-	virtual std::string getTypeName() const
+	virtual std::string getTypeName() 
 	{
 		return "ASTExpressionStatement";
 	}
 
+	virtual void processVariableList(ASTBlock * block);
+
 protected:
-	const ASTExpression* m_expression;
+	 ASTExpression* m_expression;
 };
 
 /**
