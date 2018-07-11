@@ -6,6 +6,7 @@
 #ifndef __AST_H__
 #define __AST_H__
 
+#include <utility> 
 #include <string>
 #include <vector>
 #include <iostream>
@@ -52,10 +53,15 @@ class ASTStatement : public AST {
 class ASTIdentifier: public ASTExpression
 {
 public:
-	ASTIdentifier( std::string& value): m_value(value)
+	ASTIdentifier(const std::string& value):
+		m_value(value)
 	{}
-	ASTIdentifier( std::string&& value): m_value(value)
-	{}
+
+	ASTIdentifier(const std::string&& value):
+		m_value(std::forward<const std::string>(value))
+	{
+	}
+
 	~ASTIdentifier();
 
 	virtual std::string getTypeName() 
@@ -65,23 +71,30 @@ public:
 
 	virtual void debug() 
 	{
-		std::cout << getTypeName() << " : " << m_value << std::endl;
+		std::cout << getTypeName() << " : " << m_value.toString() << std::endl;
 	}
 
 	virtual void processVariableList(ASTBlock * block);
 
 protected:
-	std::string m_value;
+	ObjectString m_value;
 	int m_variableIndex = -1;
 };
 
 class ASTInteger: public ASTExpression
 {
 public:
-	ASTInteger( int& value): m_value(value)
-	{}
-	ASTInteger( int&& value): m_value(value)
-	{}
+	ASTInteger( const int& value): 
+		m_value(value)
+	{
+
+	}
+
+	ASTInteger(const int&& value): 
+		m_value(std::forward<const int>(value))
+	{
+
+	}
 	~ASTInteger();
 
 	virtual std::string getTypeName() 
@@ -97,16 +110,23 @@ public:
 	virtual void processVariableList(ASTBlock * block);
 
 protected:
-	 int m_value;
+	 ObjectInteger m_value;
 };
 
 class ASTDecimal: public ASTExpression
 {
 public:
-	ASTDecimal( double& value): m_value(value)
-	{}
-	ASTDecimal( double&& value): m_value(value)
-	{}
+	ASTDecimal( const double& value): 
+		m_value(value)
+	{
+
+	}
+
+	ASTDecimal(const double&& value): 
+		m_value(std::forward<const double>(value))
+	{
+
+	}
 	~ASTDecimal();
 
 	virtual std::string getTypeName() 
@@ -122,15 +142,17 @@ public:
 	virtual void processVariableList(ASTBlock * block);
 
 protected:
-	 double m_value;
+	 ObjectDecimal m_value;
 };
 
 class ASTString: public ASTExpression
 {
 public:
-	ASTString( std::string& value): m_value(value)
+	ASTString( const std::string& value): 
+		m_value(value)
 	{}
-	ASTString( std::string&& value): m_value(value)
+	ASTString( const std::string&& value): 
+		m_value(std::forward<const std::string>(value))
 	{}
 
 	virtual std::string getTypeName() 
@@ -145,7 +167,7 @@ public:
 
 
 protected:
-	 std::string m_value;
+	 ObjectString m_value;
 };
 
 class ASTAssignment: public ASTExpression
@@ -203,8 +225,8 @@ public:
 
 protected:
 	int m_op;
-	 AST* m_left;
-	 AST* m_right;
+	AST* m_left;
+	AST* m_right;
 };
 
 /**
@@ -286,11 +308,11 @@ public:
 		m_parentBlock = block;
 	}
 
-	int getVariableIndex( std::string& name)
+	int getVariableIndex(const ObjectString* variable)
 	{
 		for (size_t i = 0, size = m_variables.size(); i < size; ++i)
 		{
-			if (m_variables[i] == name)
+			if (m_variables[i]->cmpEQ(variable))
 			{
 				return (int)i;
 			}
@@ -298,16 +320,16 @@ public:
 		return -1;
 	}
 
-	int addVariable( std::string& name)
+	int addVariable(ObjectString* variable)
 	{
 		for (size_t i = 0, size = m_variables.size(); i < size; ++i)
 		{
-			if (m_variables[i] == name)
+			if (m_variables[i]->cmpEQ(variable))
 			{
 				return i;
 			}
 		}
-		m_variables.emplace_back(name);
+		m_variables.push_back(variable);
 		return (int)m_variables.size() - 1;
 	}
 
@@ -322,7 +344,7 @@ public:
 protected:
 	std::vector<ASTChunk*> m_chunks;
 	ASTBlock* m_parentBlock;
-	std::vector<std::string> m_variables;
+	std::vector<ObjectString*> m_variables;
 };
 
 class ASTExpressionStatement : public ASTExpression 

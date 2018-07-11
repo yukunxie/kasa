@@ -3,6 +3,7 @@
 
 #include <string>
 #include <string.h>
+#include <iostream>
 #include "kasa_assert.h"
 
 enum BuiltinType
@@ -13,6 +14,14 @@ enum BuiltinType
     //--------------------------------
     TYPE_COUNT
 };
+
+class ObjectInteger;
+class ObjectDecimal;
+class ObjectString;
+
+std::ostream& operator<<(std::ostream& out, const ObjectInteger& obj);
+std::ostream& operator<<(std::ostream& out, const ObjectDecimal& obj);
+std::ostream& operator<<(std::ostream& out, const ObjectString& obj);
 
 class Object 
 {
@@ -25,7 +34,7 @@ public:
         return m_type;
     }
 
-    virtual std::string toString()
+    virtual std::string toString() const
     {
         return "";
     }
@@ -72,7 +81,19 @@ protected:
 class ObjectInteger: public Object
 {
 public:
-    ObjectInteger(int value):
+    ObjectInteger():
+        m_value(0)
+    {
+        m_type = TYPE_INT;
+    }
+
+    ObjectInteger(const int& value):
+        m_value(value)
+    {
+        m_type = TYPE_INT;
+    }
+
+    ObjectInteger(const int&& value):
         m_value(value)
     {
         m_type = TYPE_INT;
@@ -86,7 +107,7 @@ public:
         return vsize;
     }
 
-    virtual std::string toString()
+    virtual std::string toString() const
     {
         return std::to_string(m_value);
     }
@@ -115,7 +136,19 @@ private:
 class ObjectDecimal: public Object
 {
 public:
-    ObjectDecimal(double value):
+    ObjectDecimal():
+        m_value(0)
+    {
+        m_type = TYPE_DECIMAL;
+    }
+
+    ObjectDecimal(const double& value):
+        m_value(value)
+    {
+        m_type = TYPE_DECIMAL;
+    }
+
+    ObjectDecimal(const double&& value):
         m_value(value)
     {
         m_type = TYPE_DECIMAL;
@@ -136,7 +169,7 @@ public:
         return vsize;
     }
 
-    virtual std::string toString()
+    virtual std::string toString() const
     {
         return std::to_string(m_value);
     }
@@ -158,6 +191,18 @@ private:
 class ObjectString: public Object
 {
 public:
+    ObjectString():
+        m_value("")
+    {
+        m_type = TYPE_STRING;
+    }
+
+    ObjectString(const std::string& value):
+        m_value(value)
+    {
+        m_type = TYPE_STRING;
+    }
+
     ObjectString(const std::string&& value):
         m_value(value)
     {
@@ -179,7 +224,7 @@ public:
         return vsize;
     }
 
-    virtual std::string toString()
+    virtual std::string toString() const
     {
         return m_value;
     }
@@ -189,7 +234,12 @@ public:
         return m_value;
     }
 
-    void setValue(std::string&& value)
+    void setValue(const std::string& value)
+    {
+        m_value = value;
+    }
+
+    void setValue(const std::string&& value)
     {
         m_value = value;
     }

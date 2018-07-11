@@ -6,6 +6,7 @@
  ************************************************************************/
 #include <fstream>
 #include <string>
+#include <string.h>
 #include<iostream>
 #include "ast.h"
 #include "object.h"
@@ -25,14 +26,27 @@ int main()
     ObjectString a("123");
     ObjectString b("123 " );
     cout << "eq " << (a.cmpEQ(&b)) << endl;
+    char buffer[100];
+    memset(buffer, 0, sizeof(buffer));
+    size_t size = b.serialize(buffer, sizeof(buffer));
+    cout << size << " " << buffer << endl;
 
+    size += a.serialize(buffer+ size, sizeof(buffer) - size);
+    cout << size << " " << buffer << endl;
+
+    ObjectInteger i('abcd');
+    size += i.serialize(buffer+ size, sizeof(buffer) - size);
+    cout << size << " " << buffer << endl;
+
+
+    cout << a << " " << b << " " << i << " " << b.getType()<< endl;
     std::ifstream ifs("test.ks");
     std::string content( (std::istreambuf_iterator<char>(ifs) ), (std::istreambuf_iterator<char>()));
 
     //char string[] = "{a = (b / 10); c = a + b;}";
-    YY_BUFFER_STATE buffer = yy_scan_string(content.c_str());
+    YY_BUFFER_STATE code = yy_scan_string(content.c_str());
     yyparse();
-    yy_delete_buffer(buffer);
+    yy_delete_buffer(code);
 
     programBlock->processVariableList(nullptr);
     delete programBlock;

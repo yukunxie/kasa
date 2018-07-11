@@ -1,6 +1,25 @@
 #include "object.h"
 #include <math.h>
 
+std::ostream& operator<<(std::ostream& out, const ObjectInteger& obj)
+{
+    out<< obj.toString();
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, const ObjectDecimal& obj)
+{
+    out<< obj.toString();
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, const ObjectString& obj)
+{
+    out<< obj.toString();
+    return out;
+}
+
+
 bool DecimalCmpEQ(const double& a, const double& b)
 {
     const static double EPSILON = 1e-5;

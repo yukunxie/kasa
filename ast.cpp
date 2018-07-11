@@ -6,8 +6,8 @@ ASTIdentifier::~ASTIdentifier()
 
 void ASTIdentifier::processVariableList(ASTBlock * block)
 {
-    m_variableIndex = block->addVariable(m_value);
-    std::cout << m_value << " idx " << m_variableIndex << std::endl;
+    m_variableIndex = block->addVariable(&m_value);
+    //std::cout << m_value << " idx " << m_variableIndex << std::endl;
 }
 
 ASTInteger::~ASTInteger()
@@ -21,7 +21,6 @@ void ASTInteger::processVariableList(ASTBlock * block)
 ASTDecimal::~ASTDecimal()
 {
 }
-
 
 void ASTDecimal::processVariableList(ASTBlock * block)
 {
