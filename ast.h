@@ -71,7 +71,7 @@ public:
 	virtual void processVariableList(ASTBlock * block);
 
 protected:
-	 std::string m_value;
+	std::string m_value;
 	int m_variableIndex = -1;
 };
 

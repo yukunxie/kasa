@@ -2,6 +2,8 @@
 #define __OBJECT_H__
 
 #include <string>
+#include <string.h>
+#include "kasa_assert.h"
 
 enum BuiltinType
 {
@@ -21,6 +23,16 @@ public:
     virtual BuiltinType getType() const
     {
         return m_type;
+    }
+
+    virtual std::string toString()
+    {
+        return "";
+    }
+
+    virtual size_t serialize(char* buffer, size_t bufferSize)
+    {
+        return (size_t)0;
     }
 
     virtual bool cmpEQ(const Object* obj) const
@@ -66,6 +78,26 @@ public:
         m_type = TYPE_INT;
     }
 
+    virtual size_t serialize(char* buffer, size_t bufferSize)
+    {
+        const static size_t vsize = sizeof(m_value);
+        KASA_ASSERT(bufferSize >= vsize, "buffer space is not enough");
+        memcpy(buffer, (char*)&m_value, vsize);
+        return vsize;
+    }
+
+    virtual std::string toString()
+    {
+        return std::to_string(m_value);
+    }
+
+    virtual bool cmpEQ(const Object* obj) const;
+    virtual bool cmpNE(const Object* obj) const;
+    virtual bool cmpLE(const Object* obj) const;
+    virtual bool cmpLT(const Object* obj) const;
+    virtual bool cmpGE(const Object* obj) const;
+    virtual bool cmpGT(const Object* obj) const;
+
     int getValue() const
     {
         return m_value;
@@ -75,13 +107,6 @@ public:
     {
         m_value = value;
     }
-
-    virtual bool cmpEQ(const Object* obj) const;
-    virtual bool cmpNE(const Object* obj) const;
-    virtual bool cmpLE(const Object* obj) const;
-    virtual bool cmpLT(const Object* obj) const;
-    virtual bool cmpGE(const Object* obj) const;
-    virtual bool cmpGT(const Object* obj) const;
 
 private:
     int m_value;
@@ -96,6 +121,26 @@ public:
         m_type = TYPE_DECIMAL;
     }
 
+    virtual bool cmpEQ(const Object* obj) const;
+    virtual bool cmpNE(const Object* obj) const;
+    virtual bool cmpLE(const Object* obj) const;
+    virtual bool cmpLT(const Object* obj) const;
+    virtual bool cmpGE(const Object* obj) const;
+    virtual bool cmpGT(const Object* obj) const;
+
+    virtual size_t serialize(char* buffer, size_t bufferSize)
+    {
+        const static size_t vsize = sizeof(m_value);
+        KASA_ASSERT(bufferSize >= vsize, "buffer space is not enough");
+        memcpy(buffer, (char*)&m_value, vsize);
+        return vsize;
+    }
+
+    virtual std::string toString()
+    {
+        return std::to_string(m_value);
+    }
+
     double getValue() const
     {
         return m_value;
@@ -105,13 +150,6 @@ public:
     {
         m_value = value;
     }
-
-    virtual bool cmpEQ(const Object* obj) const;
-    virtual bool cmpNE(const Object* obj) const;
-    virtual bool cmpLE(const Object* obj) const;
-    virtual bool cmpLT(const Object* obj) const;
-    virtual bool cmpGE(const Object* obj) const;
-    virtual bool cmpGT(const Object* obj) const;
 
 private:
     double m_value;
@@ -126,6 +164,26 @@ public:
         m_type = TYPE_STRING;
     }
 
+    virtual bool cmpEQ(const Object* obj) const;
+    virtual bool cmpNE(const Object* obj) const;
+    virtual bool cmpLE(const Object* obj) const;
+    virtual bool cmpLT(const Object* obj) const;
+    virtual bool cmpGE(const Object* obj) const;
+    virtual bool cmpGT(const Object* obj) const;
+
+    virtual size_t serialize(char* buffer, size_t bufferSize)
+    {
+        size_t vsize = m_value.size();
+        KASA_ASSERT(bufferSize >= vsize, "buffer space is not enough");
+        memcpy(buffer, m_value.c_str(), vsize);
+        return vsize;
+    }
+
+    virtual std::string toString()
+    {
+        return m_value;
+    }
+
     std::string getValue() const
     {
         return m_value;
@@ -135,13 +193,6 @@ public:
     {
         m_value = value;
     }
-
-    virtual bool cmpEQ(const Object* obj) const;
-    virtual bool cmpNE(const Object* obj) const;
-    virtual bool cmpLE(const Object* obj) const;
-    virtual bool cmpLT(const Object* obj) const;
-    virtual bool cmpGE(const Object* obj) const;
-    virtual bool cmpGT(const Object* obj) const;
 
 private:
     std::string m_value;

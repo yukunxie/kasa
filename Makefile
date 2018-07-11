@@ -1,5 +1,5 @@
-CXX=g++ -g
-CXXFLAGS= -std=c++11 -DNDEBUG -Wdeprecated-register
+CXX=g++
+CXXFLAGS='-std=c++11' -DNDEBUG
 OUTPUT= ./debug
 
 all: kasa
@@ -8,7 +8,8 @@ OBJS = kasa_parser.o  \
        main.o    \
        kasa_tokens.o  \
 	   ast.o \
-	   object.o
+	   object.o \
+	   kasa_assert.o \
 
 main: main.o
 	$(CXX) -o main main.o $(CXXFLAGS)
