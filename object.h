@@ -34,6 +34,11 @@ public:
         return m_type;
     }
 
+    virtual std::string getTypeName() const
+    {
+        return "Object";
+    }
+
     virtual std::string toString() const
     {
         return "";
@@ -99,6 +104,11 @@ public:
         m_type = TYPE_INT;
     }
 
+    virtual std::string getTypeName() const
+    {
+        return "ObjectInteger";
+    }
+
     virtual size_t serialize(char* buffer, size_t bufferSize)
     {
         const static size_t vsize = sizeof(m_value);
@@ -154,6 +164,12 @@ public:
         m_type = TYPE_DECIMAL;
     }
 
+    virtual std::string getTypeName() const
+    {
+        return "ObjectDecimal";
+    }
+
+
     virtual bool cmpEQ(const Object* obj) const;
     virtual bool cmpNE(const Object* obj) const;
     virtual bool cmpLE(const Object* obj) const;
@@ -207,6 +223,11 @@ public:
         m_value(value)
     {
         m_type = TYPE_STRING;
+    }
+
+    virtual std::string getTypeName() const
+    {
+        return "ObjectString";
     }
 
     virtual bool cmpEQ(const Object* obj) const;

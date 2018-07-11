@@ -55,8 +55,8 @@ int main()
     delete programBlock;
 
     ObjectCode codeobject;
-    codeobject.variables.push_back(&a);
-    codeobject.variables.push_back(&b);
+    codeobject.variables.push_back(new ObjectString("a"));
+    codeobject.variables.push_back(new ObjectString("b"));
     codeobject.consts.push_back(new ObjectInteger(99));
     codeobject.consts.push_back(new ObjectInteger(77));
     codeobject.consts.push_back(new ObjectInteger(88));

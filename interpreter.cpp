@@ -3,8 +3,136 @@
 #include "interpreter.h"
 #include "opcode.h"
 
-Object* _opArithmetical(const Object* a, const Object* b)
+Object* operator + (const ObjectInteger& a, const ObjectInteger& b)
 {
+    int value = a.getValue() + b.getValue();
+    return new ObjectInteger(value);
+}
+
+Object* operator - (const ObjectInteger& a, const ObjectInteger& b)
+{
+    int value = a.getValue() - b.getValue();
+    return new ObjectInteger(value);
+}
+
+Object* operator * (const ObjectInteger& a, const ObjectInteger& b)
+{
+    int value = a.getValue() * b.getValue();
+    return new ObjectInteger(value);
+}
+
+Object* operator / (const ObjectInteger& a, const ObjectInteger& b)
+{
+    KASA_ASSERT(b.getValue() != 0, "divisor can not be zero.");
+    int value = a.getValue() / b.getValue();
+    return new ObjectInteger(value);
+}
+
+Object* operator + (const ObjectDecimal& a, const ObjectDecimal& b)
+{
+    double value = a.getValue() + b.getValue();
+    return new ObjectDecimal(value);
+}
+
+Object* operator - (const ObjectDecimal& a, const ObjectDecimal& b)
+{
+    double value = a.getValue() - b.getValue();
+    return new ObjectDecimal(value);
+}
+
+Object* operator * (const ObjectDecimal& a, const ObjectDecimal& b)
+{
+    double value = a.getValue() * b.getValue();
+    return new ObjectDecimal(value);
+}
+
+Object* operator / (const ObjectDecimal& a, const ObjectDecimal& b)
+{
+    KASA_ASSERT(b.getValue() != 0.0, "divisor can not be zero.");
+    double value = a.getValue() / b.getValue();
+    return new ObjectDecimal(value);
+}
+
+Object* operator + (const ObjectInteger& a, const ObjectDecimal& b)
+{
+    double value = a.getValue() + b.getValue();
+    return new ObjectDecimal(value);
+}
+
+Object* operator - (const ObjectInteger& a, const ObjectDecimal& b)
+{
+    double value = a.getValue() - b.getValue();
+    return new ObjectDecimal(value);
+}
+
+Object* operator * (const ObjectInteger& a, const ObjectDecimal& b)
+{
+    double value = a.getValue() * b.getValue();
+    return new ObjectDecimal(value);
+}
+
+Object* operator / (const ObjectInteger& a, const ObjectDecimal& b)
+{
+    KASA_ASSERT(b.getValue() != 0.0, "divisor can not be zero.");
+    double value = a.getValue() / b.getValue();
+    return new ObjectDecimal(value);
+}
+
+Object* operator + (const ObjectDecimal& a, const ObjectInteger& b)
+{
+    double value = a.getValue() + b.getValue();
+    return new ObjectDecimal(value);
+}
+
+Object* operator - (const ObjectDecimal& a, const ObjectInteger& b)
+{
+    double value = a.getValue() - b.getValue();
+    return new ObjectDecimal(value);
+}
+
+Object* operator * (const ObjectDecimal& a, const ObjectInteger& b)
+{
+    double value = a.getValue() * b.getValue();
+    return new ObjectDecimal(value);
+}
+
+Object* operator / (const ObjectDecimal& a, const ObjectInteger& b)
+{
+    KASA_ASSERT(b.getValue() != 0.0, "divisor can not be zero.");
+    double value = a.getValue() / b.getValue();
+    return new ObjectDecimal(value);
+}
+
+
+Object* _opArithmetical(OP_TYPE op, const Object* a, const Object* b)
+{
+    Object* result = nullptr;
+    switch(op)
+    {
+    case OP_ADD:
+        if (a->getType() == TYPE_INT && a->getType() == TYPE_INT)
+        {
+            return *(ObjectInteger*)a + *(ObjectInteger*)b;
+        }
+        else if (a->getType() == TYPE_INT && a->getType() == TYPE_DECIMAL)
+        {
+            return *(ObjectInteger*)a + *(ObjectDecimal*)b;
+        }
+        else if (a->getType() == TYPE_DECIMAL && a->getType() == TYPE_INT)
+        {
+            return *(ObjectDecimal*)a + *(ObjectInteger*)b ;
+        }
+        else if (a->getType() == TYPE_DECIMAL && a->getType() == TYPE_DECIMAL)
+        {
+            return *(ObjectDecimal*)a + *(ObjectDecimal*)b ;
+        }
+        else
+        {
+            std::cout << "unsupport add opertion for type:" << a->getTypeName() << "+" << b->getTypeName() << std::endl;
+            return nullptr;
+        }
+        break;
+    }
     return nullptr;
 }
 
@@ -65,14 +193,15 @@ void Interpreter::execute(const ObjectCode* codeobject)
         {
         case OP_LOAD_CONST:
             frame.variables[param1] = value2;
-            std::cout << codeobject->variables[param1]->toString() << " : " << frame.variables[param1]->toString() << std::endl;
+            //std::cout << codeobject->variables[param1]->toString() << " : " << frame.variables[param1]->toString() << std::endl;
             break;
         case OP_ADD:
         case OP_MUL:
         case OP_SUB:
         case OP_DIV:
-            // frame.variables[param1] = value2.opAdd(value3);
-            // std::cout << codeobject->variables[param1]->toString() << " : " << frame.variables[param1]->toString() << std::endl;
+            std::cout << "xxx" << value2 << ":" << value3 << " " << param1 << " " << frame.variables.size() << std::endl;
+            frame.variables[param1] = _opArithmetical(op, value2, value3);// value2.opAdd(value3);
+            std::cout << *codeobject->variables[param1]<< std::endl;
             break;
         }
     }
