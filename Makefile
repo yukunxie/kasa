@@ -4,12 +4,13 @@ OUTPUT= ./debug
 
 all: kasa
 
-OBJS = kasa_parser.o  \
-       main.o    \
-       kasa_tokens.o  \
-	   ast.o \
-	   object.o \
-	   kasa_assert.o \
+OBJS = kasa_parser.o  	\
+       main.o    		\
+       kasa_tokens.o  	\
+	   ast.o 			\
+	   object.o 		\
+	   kasa_assert.o 	\
+	   interpreter.o 	\
 
 main: main.o
 	$(CXX) -o main main.o $(CXXFLAGS)

@@ -10,7 +10,10 @@
 #include<iostream>
 #include "ast.h"
 #include "object.h"
+#include "opcode.h"
 #include "kasa_assert.h"
+#include "interpreter.h"
+#include "object_code.h"
 using namespace std;
 
 typedef struct yy_buffer_state * YY_BUFFER_STATE;
@@ -50,5 +53,23 @@ int main()
 
     programBlock->processVariableList(nullptr);
     delete programBlock;
+
+    ObjectCode codeobject;
+    codeobject.variables.push_back("a");
+    codeobject.variables.push_back("b");
+    codeobject.consts.push_back(99);
+    codeobject.consts.push_back(77);
+    codeobject.consts.push_back(88);
+    codeobject.codes.push_back(OP_LOAD_CONST);
+    codeobject.codes.push_back(1);
+    codeobject.codes.push_back(128 + 0);
+
+    codeobject.codes.push_back(OP_ADD);
+    codeobject.codes.push_back(0);
+    codeobject.codes.push_back(1);
+    codeobject.codes.push_back(128 + 2);
+
+    Interpreter interpreter;
+    interpreter.execute(&codeobject);
 	return 0;
 }
