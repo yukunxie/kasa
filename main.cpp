@@ -26,8 +26,8 @@ extern ASTModule *programBlock;
 int main()
 {
     //KASA_ASSERT(false, "aaaaaaaaaaaaaaaa");
-    ObjectString a("123");
-    ObjectString b("123 " );
+    ObjectString a("a");
+    ObjectString b("b" );
     cout << "eq " << (a.cmpEQ(&b)) << endl;
     char buffer[100];
     memset(buffer, 0, sizeof(buffer));
@@ -55,19 +55,26 @@ int main()
     delete programBlock;
 
     ObjectCode codeobject;
-    codeobject.variables.push_back("a");
-    codeobject.variables.push_back("b");
-    codeobject.consts.push_back(99);
-    codeobject.consts.push_back(77);
-    codeobject.consts.push_back(88);
+    codeobject.variables.push_back(&a);
+    codeobject.variables.push_back(&b);
+    codeobject.consts.push_back(new ObjectInteger(99));
+    codeobject.consts.push_back(new ObjectInteger(77));
+    codeobject.consts.push_back(new ObjectInteger(88));
     codeobject.codes.push_back(OP_LOAD_CONST);
     codeobject.codes.push_back(1);
-    codeobject.codes.push_back(128 + 0);
+    codeobject.codes.push_back(0);
+    codeobject.codes.push_back(RT_CONST_PARAM(0) & 0xFF);
+    codeobject.codes.push_back(RT_CONST_PARAM(0) >> 8);
+
+    cout << "kkkkkkkkkk" << RT_CONST_PARAM(0) << " " << TS_CONST_PARAM(RT_CONST_PARAM(0))  << " " << CONST_IDX_START<< endl;
 
     codeobject.codes.push_back(OP_ADD);
     codeobject.codes.push_back(0);
+    codeobject.codes.push_back(0);
     codeobject.codes.push_back(1);
-    codeobject.codes.push_back(128 + 2);
+    codeobject.codes.push_back(0);
+    codeobject.codes.push_back(RT_CONST_PARAM(2) & 0xFF);
+    codeobject.codes.push_back(RT_CONST_PARAM(2) >> 8);
 
     Interpreter interpreter;
     interpreter.execute(&codeobject);
