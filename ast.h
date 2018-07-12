@@ -87,6 +87,7 @@ class ASTIdentifier : public ASTExpression
 		std::cout << getTypeName() << " : " << m_value.toString() << std::endl;
 	}
 
+	virtual void genCodes(ObjectCode *codeobject);
 	virtual void processVariableList(ASTBlock *block);
 
   protected:
@@ -115,7 +116,7 @@ class ASTInteger : public ASTExpression
 	{
 		std::cout << getTypeName() << " : " << m_value << std::endl;
 	}
-
+	virtual void genCodes(ObjectCode *codeobject);
 	virtual void processVariableList(ASTBlock *block);
 
   protected:
@@ -197,6 +198,7 @@ class ASTAssignment : public ASTExpression
 		m_right->debug();
 	}
 
+	virtual void genCodes(ObjectCode *codeobject);
 	virtual void processVariableList(ASTBlock *block);
 
   protected:
@@ -228,6 +230,7 @@ class ASTBinaryOp : public ASTExpression
 		m_right->debug();
 	}
 
+	virtual void genCodes(ObjectCode *codeobject);
 	virtual void processVariableList(ASTBlock *block);
 
   protected:
@@ -265,7 +268,7 @@ class ASTChunk : public ASTExpression
 			it->debug();
 		}
 	}
-
+	virtual void genCodes(ObjectCode *codeobject);
 	virtual void processVariableList(ASTBlock *block);
 
   protected:
@@ -369,6 +372,7 @@ class ASTExpressionStatement : public ASTExpression
 		return "ASTExpressionStatement";
 	}
 
+	virtual void genCodes(ObjectCode *codeobject);
 	virtual void processVariableList(ASTBlock *block);
 
   protected:

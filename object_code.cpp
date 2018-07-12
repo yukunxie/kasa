@@ -51,18 +51,25 @@ void ObjectCode::addParamOP(unsigned char opcode)
 	this->g_codes.push_back(opcode);
 }
 
-void ObjectCode::addParamConstIndex(int index)
-{
-	index = RT_CONST_PARAM(index);
-	this->g_codes.push_back(index & 0xFF);
-	this->g_codes.push_back(index >> 8);
-}
+// void ObjectCode::addParamConstIndex(int index)
+// {
+// 	index = RT_CONST_PARAM(index);
+// 	this->g_codes.push_back(index & 0xFF);
+// 	this->g_codes.push_back(index >> 8);
+// }
 
 void ObjectCode::addParamVarIndex(int index)
 {
-	KASA_ASSERT(!IS_CONST_PARAM(index), "invalid index");
-	this->g_codes.push_back(index & 0xFF);
-	this->g_codes.push_back(index >> 8);
+	if (IS_CONST_PARAM(index))
+	{
+		this->g_codes.push_back(index & 0xFF);
+		this->g_codes.push_back(index >> 8);
+	}
+	else
+	{
+		this->g_codes.push_back(index & 0xFF);
+		this->g_codes.push_back(index >> 8);
+	}
 }
 
 OP_TYPE ObjectCode::pickOP(size_t &codeptr) const

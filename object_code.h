@@ -22,7 +22,6 @@ class ObjectCode : public Object
     int addConstVar(Object *constVar);
 
     void addParamOP(unsigned char opcode);
-    void addParamConstIndex(int index);
     void addParamVarIndex(int index);
 
     OP_TYPE pickOP(size_t &codeptr) const;

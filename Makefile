@@ -1,5 +1,5 @@
 CXX=g++
-CXXFLAGS='-std=c++11' -DNDEBUG
+CXXFLAGS='-std=c++11' -DNDEBUG -g
 OUTPUT= ./debug
 
 all: kasa

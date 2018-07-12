@@ -199,8 +199,9 @@ void Interpreter::execute(const ObjectCode* codeobject)
         case OP_MUL:
         case OP_SUB:
         case OP_DIV:
-            std::cout << "xxx" << value2 << ":" << value3 << " " << param1 << " " << frame.variables.size() << std::endl;
+           
             frame.variables[param1] = _opArithmetical(op, value2, value3);// value2.opAdd(value3);
+            std::cout << "xxx" << value2->toString() << ":" << value3->toString() << " " << param1 << " " << frame.variables[param1]->toString() << std::endl;
             std::cout << *codeobject->g_variables[param1]<< std::endl;
             break;
         }

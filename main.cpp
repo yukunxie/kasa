@@ -25,23 +25,24 @@ extern ASTModule *programBlock;
 int main()
 {
     //KASA_ASSERT(false, "aaaaaaaaaaaaaaaa");
-    ObjectString a("a");
-    ObjectString b("b");
-    cout << "eq " << (a.cmpEQ(&b)) << endl;
-    char buffer[100];
-    memset(buffer, 0, sizeof(buffer));
-    size_t size = b.serialize(buffer, sizeof(buffer));
-    cout << size << " " << buffer << endl;
+    // ObjectString a("a");
+    // ObjectString b("b");
+    // cout << "eq " << (a.cmpEQ(&b)) << endl;
+    // char buffer[100];
+    // memset(buffer, 0, sizeof(buffer));
+    // size_t size = b.serialize(buffer, sizeof(buffer));
+    // cout << size << " " << buffer << endl;
 
-    size += a.serialize(buffer + size, sizeof(buffer) - size);
-    cout << size << " " << buffer << endl;
+    // size += a.serialize(buffer + size, sizeof(buffer) - size);
+    // cout << size << " " << buffer << endl;
 
-    ObjectInteger i('abcd');
-    size += i.serialize(buffer + size, sizeof(buffer) - size);
-    cout << size << " " << buffer << endl;
+    // ObjectInteger i('abcd');
+    // size += i.serialize(buffer + size, sizeof(buffer) - size);
+    // cout << size << " " << buffer << endl;
 
-    cout << a << " " << b << " " << i << " " << b.getType() << endl;
-    std::ifstream ifs("test.ks");
+    // cout << a << " " << b << " " << i << " " << b.getType() << endl;
+
+    std::ifstream ifs("test1.ks");
     std::string content((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
 
     //char string[] = "{a = (b / 10); c = a + b;}";
@@ -49,28 +50,30 @@ int main()
     yyparse();
     yy_delete_buffer(code);
 
-    programBlock->processVariableList(nullptr);
+    programBlock->genCodes(nullptr);
+    
+    //programBlock->processVariableList(nullptr);
     delete programBlock;
 
-    ObjectCode codeobject;
-    codeobject.addVar(new ObjectString("a"));
-    codeobject.addVar(new ObjectString("b"));
-    codeobject.addConstVar(new ObjectInteger(99));
-    codeobject.addConstVar(new ObjectInteger(77));
-    codeobject.addConstVar(new ObjectInteger(88));
+    // ObjectCode codeobject;
+    // codeobject.addVar(new ObjectString("a"));
+    // codeobject.addVar(new ObjectString("b"));
+    // codeobject.addConstVar(new ObjectInteger(99));
+    // codeobject.addConstVar(new ObjectInteger(77));
+    // codeobject.addConstVar(new ObjectInteger(88));
 
-    codeobject.addParamOP(OP_LOAD_CONST);
-    codeobject.addParamVarIndex(1);
-    codeobject.addParamConstIndex(0);
+    // codeobject.addParamOP(OP_LOAD_CONST);
+    // codeobject.addParamVarIndex(1);
+    // codeobject.addParamConstIndex(0);
 
-    cout << "kkkkkkkkkk" << RT_CONST_PARAM(0) << " " << TS_CONST_PARAM(RT_CONST_PARAM(0)) << " " << CONST_IDX_START << endl;
+    // cout << "kkkkkkkkkk" << RT_CONST_PARAM(0) << " " << TS_CONST_PARAM(RT_CONST_PARAM(0)) << " " << CONST_IDX_START << endl;
 
-    codeobject.addParamOP(OP_ADD);
-    codeobject.addParamVarIndex(0);
-    codeobject.addParamVarIndex(1);
-    codeobject.addParamConstIndex(2);
+    // codeobject.addParamOP(OP_ADD);
+    // codeobject.addParamVarIndex(0);
+    // codeobject.addParamVarIndex(1);
+    // codeobject.addParamConstIndex(2);
 
-    Interpreter interpreter;
-    interpreter.execute(&codeobject);
+    // Interpreter interpreter;
+    // interpreter.execute(&codeobject);
     return 0;
 }
