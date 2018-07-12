@@ -8,10 +8,10 @@
 
 std::unordered_map<int, OP_TYPE> TOKEN_TO_OP_TYPE_MAP = 
 {
-    {yytokentype::TPLUS, OP_TYPE::OP_ADD},
-    {yytokentype::TMINUS, OP_TYPE::OP_SUB},
-    {yytokentype::TMUL, OP_TYPE::OP_MUL},
-    {yytokentype::TDIV, OP_TYPE::OP_DIV},
+    {TPLUS, OP_TYPE::OP_ADD},
+    {TMINUS, OP_TYPE::OP_SUB},
+    {TMUL, OP_TYPE::OP_MUL},
+    {TDIV, OP_TYPE::OP_DIV},
 };
 
 ASTIdentifier::~ASTIdentifier()
