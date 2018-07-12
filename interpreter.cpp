@@ -18,7 +18,6 @@ Object* operator - (const ObjectInteger& a, const ObjectInteger& b)
 Object* operator * (const ObjectInteger& a, const ObjectInteger& b)
 {
     int value = a.getValue() * b.getValue();
-    std::cout << "mul " << value << std::endl;
     return new ObjectInteger(value);
 }
 
@@ -256,13 +255,13 @@ void Interpreter::execute(const ObjectCode* codeobject)
             }
         }
 
-        std::cout << "params: " << (int)param1 << " " << (int)param2 << " " << (int)param3 << std::endl;
+        //std::cout << "params: " << (int)param1 << " " << (int)param2 << " " << (int)param3 << std::endl;
 
         switch(op)
         {
         case OP_LOAD_CONST:
             frame.variables[param1] = value2;
-            //std::cout << codeobject->variables[param1]->toString() << " : " << frame.variables[param1]->toString() << std::endl;
+            std::cout << codeobject->g_variables[param1]->toString() << " : " << frame.variables[param1]->toString() << std::endl;
             break;
         case OP_ADD:
         case OP_MUL:
@@ -270,8 +269,8 @@ void Interpreter::execute(const ObjectCode* codeobject)
         case OP_DIV:
            
             frame.variables[param1] = _opArithmetical(op, value2, value3);// value2.opAdd(value3);
-            std::cout << "xxx" << value2->toString() << ":" << value3->toString() << " " << param1 << " " << frame.variables[param1]->toString() << std::endl;
-            std::cout << *codeobject->g_variables[param1]<< std::endl;
+            //std::cout << "xxx" << value2->toString() << ":" << value3->toString() << " " << param1 << " " << frame.variables[param1]->toString() << std::endl;
+            //std::cout << *codeobject->g_variables[param1]<< std::endl;
             break;
         }
     }

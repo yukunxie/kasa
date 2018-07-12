@@ -75,9 +75,10 @@ void ASTAssignment::genCodes(ObjectCode *codeobject)
 {
     m_right->genCodes(codeobject);
     m_left->genCodes(codeobject);
-    // codeobject->addParamOP(OP_MOVE);
-    // codeobject->addParamVarIndex(m_left->getIndex());
-    // codeobject->addParamVarIndex(m_right->getIndex());
+
+    codeobject->addParamOP(OP_LOAD_CONST);
+    codeobject->addParamVarIndex(m_left->getIndex());
+    codeobject->addParamVarIndex(m_right->getIndex());
 }
 
 void ASTAssignment::processVariableList(ASTBlock *block)
