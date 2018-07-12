@@ -217,7 +217,6 @@ Object* _opBitset(const Object* a, const Object* b)
 void Interpreter::execute(const ObjectCode* codeobject)
 {
     Frame frame;
-    frame.variables.resize(codeobject->g_variables.size(), nullptr);
 
     size_t ptr = 0;
     while (ptr < codeobject->g_codes.size())
@@ -234,7 +233,7 @@ void Interpreter::execute(const ObjectCode* codeobject)
         }
         else
         {
-            KASA_ASSERT(frame.variables[param2], (codeobject->g_variables[param2]->toString() + " has not been init.").c_str());
+            KASA_ASSERT(frame.variables.size() > param2 && frame.variables[param2], (codeobject->g_variables[param2]->toString() + " has not been init.").c_str());
             value2 = frame.variables[param2];
         }
 
@@ -260,6 +259,7 @@ void Interpreter::execute(const ObjectCode* codeobject)
         switch(op)
         {
         case OP_LOAD_CONST:
+            while(frame.variables.size() <= param1) frame.variables.push_back(nullptr);
             frame.variables[param1] = value2;
             std::cout << codeobject->g_variables[param1]->toString() << " : " << frame.variables[param1]->toString() << std::endl;
             break;
@@ -267,7 +267,7 @@ void Interpreter::execute(const ObjectCode* codeobject)
         case OP_MUL:
         case OP_SUB:
         case OP_DIV:
-           
+             while(frame.variables.size() <= param1) frame.variables.push_back(nullptr);
             frame.variables[param1] = _opArithmetical(op, value2, value3);// value2.opAdd(value3);
             //std::cout << "xxx" << value2->toString() << ":" << value3->toString() << " " << param1 << " " << frame.variables[param1]->toString() << std::endl;
             //std::cout << *codeobject->g_variables[param1]<< std::endl;
