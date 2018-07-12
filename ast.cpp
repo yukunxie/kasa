@@ -2,6 +2,7 @@
 #include "interpreter.h"
 #include "kasa_parser.hpp"
 
+#include <stdio.h>
 #include <unordered_map>
 
 
@@ -32,8 +33,9 @@ ASTInteger::~ASTInteger()
 
 void ASTInteger::genCodes(ObjectCode *codeobject)
 {
-    m_index = codeobject->addConstVar(&m_value);
-    m_index = TS_CONST_PARAM(m_index);
+    auto index = codeobject->addConstVar(m_value);
+    m_index = RT_CONST_PARAM(index);
+    //printf("ASTInteger::genCodes %d, %d\n", index, m_index);
 }
 
 void ASTInteger::processVariableList(ASTBlock *block)
@@ -142,12 +144,15 @@ void ASTBinaryOp::genCodes(ObjectCode *codeobject)
     // trans lex token to opcode operator type
     const OP_TYPE op = TOKEN_TO_OP_TYPE_MAP[m_op];
     codeobject->addParamOP(op);
-    std::cout << "m_op " << op << std::endl;
 
     m_index =  codeobject->g_variables.size();
     codeobject->addParamVarIndex(m_index);
     codeobject->addParamVarIndex(m_left->getIndex());
     codeobject->addParamVarIndex(m_right->getIndex()); 
+
+    //std::cout << "m_op " << op << std::endl;
+
+    printf("genCodes: m_op=%d, m_index=%d, left_idx=%u, r_idx=%u type=%s\n", op, m_index, m_left->getIndex(), m_right->getIndex(), m_left->getTypeName().c_str());
 }
 
 void ASTBinaryOp::processVariableList(ASTBlock *block)

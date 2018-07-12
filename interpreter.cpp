@@ -18,6 +18,7 @@ Object* operator - (const ObjectInteger& a, const ObjectInteger& b)
 Object* operator * (const ObjectInteger& a, const ObjectInteger& b)
 {
     int value = a.getValue() * b.getValue();
+    std::cout << "mul " << value << std::endl;
     return new ObjectInteger(value);
 }
 
@@ -129,6 +130,74 @@ Object* _opArithmetical(OP_TYPE op, const Object* a, const Object* b)
         else
         {
             std::cout << "unsupport add opertion for type:" << a->getTypeName() << "+" << b->getTypeName() << std::endl;
+            return nullptr;
+        }
+    case OP_SUB:
+        if (a->getType() == TYPE_INT && a->getType() == TYPE_INT)
+        {
+            return *(ObjectInteger*)a - *(ObjectInteger*)b;
+        }
+        else if (a->getType() == TYPE_INT && a->getType() == TYPE_DECIMAL)
+        {
+            return *(ObjectInteger*)a - *(ObjectDecimal*)b;
+        }
+        else if (a->getType() == TYPE_DECIMAL && a->getType() == TYPE_INT)
+        {
+            return *(ObjectDecimal*)a - *(ObjectInteger*)b ;
+        }
+        else if (a->getType() == TYPE_DECIMAL && a->getType() == TYPE_DECIMAL)
+        {
+            return *(ObjectDecimal*)a - *(ObjectDecimal*)b ;
+        }
+        else
+        {
+            std::cout << "unsupport add opertion for type:" << a->getTypeName() << "-" << b->getTypeName() << std::endl;
+            return nullptr;
+        }
+        break;
+    case OP_MUL:
+        if (a->getType() == TYPE_INT && a->getType() == TYPE_INT)
+        {
+            return *(ObjectInteger*)a * *(ObjectInteger*)b;
+        }
+        else if (a->getType() == TYPE_INT && a->getType() == TYPE_DECIMAL)
+        {
+            return *(ObjectInteger*)a * *(ObjectDecimal*)b;
+        }
+        else if (a->getType() == TYPE_DECIMAL && a->getType() == TYPE_INT)
+        {
+            return *(ObjectDecimal*)a * *(ObjectInteger*)b ;
+        }
+        else if (a->getType() == TYPE_DECIMAL && a->getType() == TYPE_DECIMAL)
+        {
+            return *(ObjectDecimal*)a * *(ObjectDecimal*)b ;
+        }
+        else
+        {
+            std::cout << "unsupport add opertion for type:" << a->getTypeName() << "-" << b->getTypeName() << std::endl;
+            return nullptr;
+        }
+        break;
+    case OP_DIV:
+        if (a->getType() == TYPE_INT && a->getType() == TYPE_INT)
+        {
+            return *(ObjectInteger*)a / *(ObjectInteger*)b;
+        }
+        else if (a->getType() == TYPE_INT && a->getType() == TYPE_DECIMAL)
+        {
+            return *(ObjectInteger*)a / *(ObjectDecimal*)b;
+        }
+        else if (a->getType() == TYPE_DECIMAL && a->getType() == TYPE_INT)
+        {
+            return *(ObjectDecimal*)a / *(ObjectInteger*)b ;
+        }
+        else if (a->getType() == TYPE_DECIMAL && a->getType() == TYPE_DECIMAL)
+        {
+            return *(ObjectDecimal*)a / *(ObjectDecimal*)b ;
+        }
+        else
+        {
+            std::cout << "unsupport add opertion for type:" << a->getTypeName() << "-" << b->getTypeName() << std::endl;
             return nullptr;
         }
         break;

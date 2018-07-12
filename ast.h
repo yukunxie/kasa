@@ -98,13 +98,16 @@ class ASTIdentifier : public ASTExpression
 class ASTInteger : public ASTExpression
 {
   public:
-	ASTInteger(const int &value) : m_value(value)
+	ASTInteger(const int &value)
 	{
+		m_value = new ObjectInteger(value);
 	}
 
-	ASTInteger(const int &&value) : m_value(std::forward<const int>(value))
+	ASTInteger(const int &&value)
 	{
+		m_value = new ObjectInteger(std::forward<const int>(value));
 	}
+
 	~ASTInteger();
 
 	virtual std::string getTypeName()
@@ -120,7 +123,7 @@ class ASTInteger : public ASTExpression
 	virtual void processVariableList(ASTBlock *block);
 
   protected:
-	ObjectInteger m_value;
+	ObjectInteger *m_value;
 };
 
 class ASTDecimal : public ASTExpression
