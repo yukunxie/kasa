@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include "object.h"
+#include "opcode.h"
 
 typedef unsigned short PARAM_VALUE_TYPE;
 static const PARAM_VALUE_TYPE CONST_IDX_START = 1 << (sizeof(PARAM_VALUE_TYPE) * 8 - 1);
@@ -12,12 +13,25 @@ static const PARAM_VALUE_TYPE CONST_IDX_START = 1 << (sizeof(PARAM_VALUE_TYPE) *
 #define TS_CONST_PARAM(param) (param - CONST_IDX_START)
 #define RT_CONST_PARAM(param) (param + CONST_IDX_START)
 
-class ObjectCode: public Object
+class ObjectCode : public Object
 {
-public:
-    std::vector<ObjectString*> variables;
-    std::vector<Object*> consts;
-    std::vector<unsigned char> codes;
+  public:
+    int getVarIndex(const ObjectString *variable);
+    int addVar(ObjectString *variable);
+    int getConstVarIndex(const Object *constVar);
+    int addConstVar(Object *constVar);
+
+    void addParamOP(unsigned char opcode);
+    void addParamConstIndex(int index);
+    void addParamVarIndex(int index);
+
+    OP_TYPE pickOP(size_t &codeptr) const;
+    PARAM_VALUE_TYPE pickParam(size_t &codeptr) const;
+
+  public:
+    std::vector<ObjectString *> g_variables;
+    std::vector<Object *> g_consts;
+    std::vector<unsigned char> g_codes;
 };
 
 #endif

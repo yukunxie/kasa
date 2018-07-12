@@ -11,6 +11,7 @@ OBJS = kasa_parser.o  	\
 	   object.o 		\
 	   kasa_assert.o 	\
 	   interpreter.o 	\
+	   object_code.o	\
 
 main: main.o
 	$(CXX) -o main main.o $(CXXFLAGS)

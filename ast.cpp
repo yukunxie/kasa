@@ -4,26 +4,32 @@ ASTIdentifier::~ASTIdentifier()
 {
 }
 
-void ASTIdentifier::processVariableList(ASTBlock * block)
+void ASTIdentifier::processVariableList(ASTBlock *block)
 {
-    m_variableIndex = block->addVariable(&m_value);
-    //std::cout << m_value << " idx " << m_variableIndex << std::endl;
+    m_index = block->addVar(&m_value);
 }
 
 ASTInteger::~ASTInteger()
 {
 }
 
-void ASTInteger::processVariableList(ASTBlock * block)
+void ASTInteger::processVariableList(ASTBlock *block)
 {
+    m_index = block->addConstVar(&m_value);
 }
 
 ASTDecimal::~ASTDecimal()
 {
 }
 
-void ASTDecimal::processVariableList(ASTBlock * block)
+void ASTDecimal::processVariableList(ASTBlock *block)
 {
+    m_index = block->addConstVar(&m_value);
+}
+
+void ASTString::processVariableList(ASTBlock *block)
+{
+    m_index = block->addConstVar(&m_value);
 }
 
 ASTAssignment::~ASTAssignment()
@@ -41,9 +47,8 @@ ASTAssignment::~ASTAssignment()
     m_right = nullptr;
 }
 
-void ASTAssignment::processVariableList(ASTBlock * block)
+void ASTAssignment::processVariableList(ASTBlock *block)
 {
-    
 
     if (m_left)
     {
@@ -64,14 +69,13 @@ ASTChunk::~ASTChunk()
     m_expressions.clear();
 }
 
-void ASTChunk::processVariableList(ASTBlock * block)
+void ASTChunk::processVariableList(ASTBlock *block)
 {
     for (auto it : m_expressions)
     {
         it->processVariableList(block);
     }
 }
-
 
 ASTBinaryOp::~ASTBinaryOp()
 {
@@ -88,7 +92,7 @@ ASTBinaryOp::~ASTBinaryOp()
     m_right = nullptr;
 }
 
-void ASTBinaryOp::processVariableList(ASTBlock * block)
+void ASTBinaryOp::processVariableList(ASTBlock *block)
 {
     if (m_left)
     {
@@ -109,7 +113,17 @@ ASTExpressionStatement::~ASTExpressionStatement()
     m_expression = nullptr;
 }
 
-void ASTExpressionStatement::processVariableList(ASTBlock * block)
+void ASTExpressionStatement::processVariableList(ASTBlock *block)
 {
     m_expression->processVariableList(block);
+}
+
+void ASTBlock::genCodes(ObjectCode *codeobject)
+{
+    m_codeObject = new ObjectCode();
+
+    for (auto it : m_chunks)
+    {
+        it->genCodes(codeobject);
+    }
 }

@@ -7,13 +7,13 @@ enum OP_TYPE
 
     OP_LOAD_CONST,
     OP_MOVE,
-    OP_TWO_PARAM,  // 两个参数  op a, b
+    OP_TWO_PARAM, // 两个参数  op a, b
 
     OP_ADD,
     OP_SUB,
     OP_MUL,
     OP_DIV,
-    OP_TRI_PARAM,  // 三个参数 op a, b, c
+    OP_TRI_PARAM, // 三个参数 op a, b, c
 
     OP_COUNT
 };

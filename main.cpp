@@ -7,7 +7,7 @@
 #include <fstream>
 #include <string>
 #include <string.h>
-#include<iostream>
+#include <iostream>
 #include "ast.h"
 #include "object.h"
 #include "opcode.h"
@@ -16,35 +16,33 @@
 #include "object_code.h"
 using namespace std;
 
-typedef struct yy_buffer_state * YY_BUFFER_STATE;
+typedef struct yy_buffer_state *YY_BUFFER_STATE;
 extern int yyparse();
-extern YY_BUFFER_STATE yy_scan_string (const char *yy_str  );
+extern YY_BUFFER_STATE yy_scan_string(const char *yy_str);
 extern void yy_delete_buffer(YY_BUFFER_STATE buffer);
-
 
 extern ASTModule *programBlock;
 int main()
 {
     //KASA_ASSERT(false, "aaaaaaaaaaaaaaaa");
     ObjectString a("a");
-    ObjectString b("b" );
+    ObjectString b("b");
     cout << "eq " << (a.cmpEQ(&b)) << endl;
     char buffer[100];
     memset(buffer, 0, sizeof(buffer));
     size_t size = b.serialize(buffer, sizeof(buffer));
     cout << size << " " << buffer << endl;
 
-    size += a.serialize(buffer+ size, sizeof(buffer) - size);
+    size += a.serialize(buffer + size, sizeof(buffer) - size);
     cout << size << " " << buffer << endl;
 
     ObjectInteger i('abcd');
-    size += i.serialize(buffer+ size, sizeof(buffer) - size);
+    size += i.serialize(buffer + size, sizeof(buffer) - size);
     cout << size << " " << buffer << endl;
 
-
-    cout << a << " " << b << " " << i << " " << b.getType()<< endl;
+    cout << a << " " << b << " " << i << " " << b.getType() << endl;
     std::ifstream ifs("test.ks");
-    std::string content( (std::istreambuf_iterator<char>(ifs) ), (std::istreambuf_iterator<char>()));
+    std::string content((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
 
     //char string[] = "{a = (b / 10); c = a + b;}";
     YY_BUFFER_STATE code = yy_scan_string(content.c_str());
@@ -55,28 +53,24 @@ int main()
     delete programBlock;
 
     ObjectCode codeobject;
-    codeobject.variables.push_back(new ObjectString("a"));
-    codeobject.variables.push_back(new ObjectString("b"));
-    codeobject.consts.push_back(new ObjectInteger(99));
-    codeobject.consts.push_back(new ObjectInteger(77));
-    codeobject.consts.push_back(new ObjectInteger(88));
-    codeobject.codes.push_back(OP_LOAD_CONST);
-    codeobject.codes.push_back(1);
-    codeobject.codes.push_back(0);
-    codeobject.codes.push_back(RT_CONST_PARAM(0) & 0xFF);
-    codeobject.codes.push_back(RT_CONST_PARAM(0) >> 8);
+    codeobject.addVar(new ObjectString("a"));
+    codeobject.addVar(new ObjectString("b"));
+    codeobject.addConstVar(new ObjectInteger(99));
+    codeobject.addConstVar(new ObjectInteger(77));
+    codeobject.addConstVar(new ObjectInteger(88));
 
-    cout << "kkkkkkkkkk" << RT_CONST_PARAM(0) << " " << TS_CONST_PARAM(RT_CONST_PARAM(0))  << " " << CONST_IDX_START<< endl;
+    codeobject.addParamOP(OP_LOAD_CONST);
+    codeobject.addParamVarIndex(1);
+    codeobject.addParamConstIndex(0);
 
-    codeobject.codes.push_back(OP_ADD);
-    codeobject.codes.push_back(0);
-    codeobject.codes.push_back(0);
-    codeobject.codes.push_back(1);
-    codeobject.codes.push_back(0);
-    codeobject.codes.push_back(RT_CONST_PARAM(2) & 0xFF);
-    codeobject.codes.push_back(RT_CONST_PARAM(2) >> 8);
+    cout << "kkkkkkkkkk" << RT_CONST_PARAM(0) << " " << TS_CONST_PARAM(RT_CONST_PARAM(0)) << " " << CONST_IDX_START << endl;
+
+    codeobject.addParamOP(OP_ADD);
+    codeobject.addParamVarIndex(0);
+    codeobject.addParamVarIndex(1);
+    codeobject.addParamConstIndex(2);
 
     Interpreter interpreter;
     interpreter.execute(&codeobject);
-	return 0;
+    return 0;
 }

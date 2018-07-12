@@ -6,11 +6,12 @@
 #ifndef __AST_H__
 #define __AST_H__
 
-#include <utility> 
+#include <utility>
 #include <string>
 #include <vector>
 #include <iostream>
 #include "object.h"
+#include "object_code.h"
 
 #define DEBUG_OUTPUT 1
 
@@ -18,259 +19,265 @@ class ASTBlock;
 class ASTChunk;
 
 class AST
-{	
-public:
+{
+  public:
 	virtual ~AST()
 	{
 	}
 
-	virtual std::string getTypeName() 
+	virtual std::string getTypeName()
 	{
 		return "AST";
 	}
 
-	virtual void debug() 
-	{}
-	
-	void outputDebug() 
+	virtual void debug()
+	{
+	}
+
+	void outputDebug()
 	{
 #if DEBUG_OUTPUT
 		debug();
-#endif 
+#endif
 	}
 
-	virtual void processVariableList(ASTBlock * block)
+	virtual int getIndex()
+	{
+		return m_index;
+	}
+
+	virtual void processVariableList(ASTBlock *block)
 	{
 	}
+
+	virtual void genCodes(ObjectCode *codeobject){};
+
+  protected:
+	int m_index = -1;
 };
 
-class ASTExpression : public AST {
-};
-
-class ASTStatement : public AST {
-};
-
-class ASTIdentifier: public ASTExpression
+class ASTExpression : public AST
 {
-public:
-	ASTIdentifier(const std::string& value):
-		m_value(value)
-	{}
+};
 
-	ASTIdentifier(const std::string&& value):
-		m_value(std::forward<const std::string>(value))
+class ASTStatement : public AST
+{
+};
+
+class ASTIdentifier : public ASTExpression
+{
+  public:
+	ASTIdentifier(const std::string &value) : m_value(value)
+	{
+	}
+
+	ASTIdentifier(const std::string &&value) : m_value(std::forward<const std::string>(value))
 	{
 	}
 
 	~ASTIdentifier();
 
-	virtual std::string getTypeName() 
+	virtual std::string getTypeName()
 	{
 		return "ASTIdentifier";
 	}
 
-	virtual void debug() 
+	virtual void debug()
 	{
 		std::cout << getTypeName() << " : " << m_value.toString() << std::endl;
 	}
 
-	virtual void processVariableList(ASTBlock * block);
+	virtual void processVariableList(ASTBlock *block);
 
-protected:
+  protected:
 	ObjectString m_value;
 	int m_variableIndex = -1;
 };
 
-class ASTInteger: public ASTExpression
+class ASTInteger : public ASTExpression
 {
-public:
-	ASTInteger( const int& value): 
-		m_value(value)
+  public:
+	ASTInteger(const int &value) : m_value(value)
 	{
-
 	}
 
-	ASTInteger(const int&& value): 
-		m_value(std::forward<const int>(value))
+	ASTInteger(const int &&value) : m_value(std::forward<const int>(value))
 	{
-
 	}
 	~ASTInteger();
 
-	virtual std::string getTypeName() 
+	virtual std::string getTypeName()
 	{
 		return "ASTInteger";
 	}
 
-	virtual void debug() 
+	virtual void debug()
 	{
 		std::cout << getTypeName() << " : " << m_value << std::endl;
 	}
 
-	virtual void processVariableList(ASTBlock * block);
+	virtual void processVariableList(ASTBlock *block);
 
-protected:
-	 ObjectInteger m_value;
+  protected:
+	ObjectInteger m_value;
 };
 
-class ASTDecimal: public ASTExpression
+class ASTDecimal : public ASTExpression
 {
-public:
-	ASTDecimal( const double& value): 
-		m_value(value)
+  public:
+	ASTDecimal(const double &value) : m_value(value)
 	{
-
 	}
 
-	ASTDecimal(const double&& value): 
-		m_value(std::forward<const double>(value))
+	ASTDecimal(const double &&value) : m_value(std::forward<const double>(value))
 	{
-
 	}
 	~ASTDecimal();
 
-	virtual std::string getTypeName() 
+	virtual std::string getTypeName()
 	{
 		return "ASTDecimal";
 	}
 
-	virtual void debug() 
+	virtual void debug()
 	{
 		std::cout << getTypeName() << " : " << m_value << std::endl;
 	}
 
-	virtual void processVariableList(ASTBlock * block);
+	virtual void processVariableList(ASTBlock *block);
 
-protected:
-	 ObjectDecimal m_value;
+  protected:
+	ObjectDecimal m_value;
 };
 
-class ASTString: public ASTExpression
+class ASTString : public ASTExpression
 {
-public:
-	ASTString( const std::string& value): 
-		m_value(value)
-	{}
-	ASTString( const std::string&& value): 
-		m_value(std::forward<const std::string>(value))
-	{}
+  public:
+	ASTString(const std::string &value) : m_value(value)
+	{
+	}
+	ASTString(const std::string &&value) : m_value(std::forward<const std::string>(value))
+	{
+	}
 
-	virtual std::string getTypeName() 
+	virtual std::string getTypeName()
 	{
 		return "ASTString";
 	}
 
-	virtual void debug() 
+	virtual void debug()
 	{
 		std::cout << getTypeName() << " : " << m_value << std::endl;
 	}
 
+	virtual void processVariableList(ASTBlock *block);
 
-protected:
-	 ObjectString m_value;
+  protected:
+	ObjectString m_value;
 };
 
-class ASTAssignment: public ASTExpression
-{	
-public:
-	ASTAssignment( AST* left,  AST* right):
-		m_left(left), 
-		m_right(right)
-	{}
+class ASTAssignment : public ASTExpression
+{
+  public:
+	ASTAssignment(AST *left, AST *right) : m_left(left),
+										   m_right(right)
+	{
+	}
 	~ASTAssignment();
 
-	virtual std::string getTypeName() 
+	virtual std::string getTypeName()
 	{
 		return "ASTAssignment";
 	}
 
-	virtual void debug() 
+	virtual void debug()
 	{
-		std::cout << getTypeName() << " >>> "<< std::endl;
+		std::cout << getTypeName() << " >>> " << std::endl;
 		m_left->debug();
 		m_right->debug();
 	}
 
-	virtual void processVariableList(ASTBlock * block);
+	virtual void processVariableList(ASTBlock *block);
 
-protected:
-	 AST* m_left;
-	 AST* m_right;
+  protected:
+	AST *m_left;
+	AST *m_right;
 };
 
-class ASTBinaryOp: public ASTExpression
+class ASTBinaryOp : public ASTExpression
 {
-public:
-	ASTBinaryOp(int op,  AST* left,  AST* right):
-		m_op(op),
-		m_left(left), 
-		m_right(right)
-	{}
+  public:
+	ASTBinaryOp(int op, AST *left, AST *right) : m_op(op),
+												 m_left(left),
+												 m_right(right)
+	{
+	}
 	~ASTBinaryOp();
 
-	virtual std::string getTypeName() 
+	virtual std::string getTypeName()
 	{
 		return "ASTBinaryOp";
 	}
 
-	virtual void debug() 
+	virtual void debug()
 	{
-		std::cout << getTypeName() << " >>> " << std::endl; 
+		std::cout << getTypeName() << " >>> " << std::endl;
 		m_left->debug();
-		std::cout << "op" << " " << m_op << std::endl;
+		std::cout << "op"
+				  << " " << m_op << std::endl;
 		m_right->debug();
 	}
 
-	virtual void processVariableList(ASTBlock * block);
+	virtual void processVariableList(ASTBlock *block);
 
-protected:
+  protected:
 	int m_op;
-	AST* m_left;
-	AST* m_right;
+	AST *m_left;
+	AST *m_right;
 };
 
 /**
  * a code block in a block
 */
-class ASTChunk: public ASTExpression
+class ASTChunk : public ASTExpression
 {
-public:
+  public:
 	ASTChunk()
 	{
 	}
 
 	~ASTChunk();
-	
-	void pushBack( ASTExpression* node)
+
+	void pushBack(ASTExpression *node)
 	{
 		m_expressions.push_back(node);
 	}
 
-	virtual std::string getTypeName() 
+	virtual std::string getTypeName()
 	{
 		return "ASTChunk";
 	}
 
-	virtual void debug() 
+	virtual void debug()
 	{
 		for (auto it : m_expressions)
 		{
 			it->debug();
 		}
-		
 	}
 
-	virtual void processVariableList(ASTBlock * block);
+	virtual void processVariableList(ASTBlock *block);
 
-protected:
-	std::vector<AST*> m_expressions;
+  protected:
+	std::vector<AST *> m_expressions;
 };
 
-class ASTBlock: public AST
+class ASTBlock : public AST
 {
-public:
+  public:
 	ASTBlock()
-	{}
+	{
+	}
 
 	~ASTBlock()
 	{
@@ -279,18 +286,18 @@ public:
 			delete it;
 		}
 	};
-	
-	void pushBack(ASTChunk* chunk)
+
+	void pushBack(ASTChunk *chunk)
 	{
 		m_chunks.push_back(chunk);
 	}
 
-	virtual std::string getTypeName() 
+	virtual std::string getTypeName()
 	{
 		return "ASTBlock";
 	}
 
-	virtual void debug() 
+	virtual void debug()
 	{
 		for (auto it : m_chunks)
 		{
@@ -298,42 +305,39 @@ public:
 		}
 	}
 
-	ASTBlock* getParentBlock()
+	virtual void genCodes(ObjectCode *codeobject);
+
+	ASTBlock *getParentBlock()
 	{
 		return m_parentBlock;
 	}
 
-	void setParentBlock(ASTBlock* block)
+	void setParentBlock(ASTBlock *block)
 	{
 		m_parentBlock = block;
 	}
 
-	int getVariableIndex(const ObjectString* variable)
+	int getVarIndex(const ObjectString *variable)
 	{
-		for (size_t i = 0, size = m_variables.size(); i < size; ++i)
-		{
-			if (m_variables[i]->cmpEQ(variable))
-			{
-				return (int)i;
-			}
-		}
-		return -1;
+		return m_codeObject->getVarIndex(variable);
 	}
 
-	int addVariable(ObjectString* variable)
+	int addVar(ObjectString *variable)
 	{
-		for (size_t i = 0, size = m_variables.size(); i < size; ++i)
-		{
-			if (m_variables[i]->cmpEQ(variable))
-			{
-				return i;
-			}
-		}
-		m_variables.push_back(variable);
-		return (int)m_variables.size() - 1;
+		return m_codeObject->addVar(variable);
 	}
 
-	virtual void processVariableList(ASTBlock * block) 
+	int getConstVarIndex(const Object *constVar)
+	{
+		return m_codeObject->getConstVarIndex(constVar);
+	}
+
+	int addConstVar(Object *constVar)
+	{
+		return m_codeObject->addConstVar(constVar);
+	}
+
+	virtual void processVariableList(ASTBlock *block)
 	{
 		for (auto it : m_chunks)
 		{
@@ -341,48 +345,47 @@ public:
 		}
 	}
 
-protected:
-	std::vector<ASTChunk*> m_chunks;
-	ASTBlock* m_parentBlock;
-	std::vector<ObjectString*> m_variables;
+  protected:
+	std::vector<ASTChunk *> m_chunks;
+	ASTBlock *m_parentBlock;
+	ObjectCode *m_codeObject;
 };
 
-class ASTExpressionStatement : public ASTExpression 
+class ASTExpressionStatement : public ASTExpression
 {
-public:
-	virtual void debug() 
+  public:
+	virtual void debug()
 	{
 		m_expression->debug();
 	}
 
-	ASTExpressionStatement( ASTExpression* expression) : 
-		m_expression(expression) 
-	{ }
+	ASTExpressionStatement(ASTExpression *expression) : m_expression(expression)
+	{
+	}
 	~ASTExpressionStatement();
 
-	virtual std::string getTypeName() 
+	virtual std::string getTypeName()
 	{
 		return "ASTExpressionStatement";
 	}
 
-	virtual void processVariableList(ASTBlock * block);
+	virtual void processVariableList(ASTBlock *block);
 
-protected:
-	 ASTExpression* m_expression;
+  protected:
+	ASTExpression *m_expression;
 };
 
 /**
  * module is a file.
 */
-class ASTModule: public ASTBlock
+class ASTModule : public ASTBlock
 {
-public:
+  public:
 	ASTModule()
-	{}
-
-	~ASTModule()
 	{
-	};
+	}
+
+	~ASTModule(){};
 };
 
 #endif

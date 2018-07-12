@@ -149,24 +149,24 @@ Object* _opBitset(const Object* a, const Object* b)
 void Interpreter::execute(const ObjectCode* codeobject)
 {
     Frame frame;
-    frame.variables.resize(codeobject->variables.size(), nullptr);
+    frame.variables.resize(codeobject->g_variables.size(), nullptr);
 
     size_t ptr = 0;
-    while (ptr < codeobject->codes.size())
+    while (ptr < codeobject->g_codes.size())
     {
-        OP_TYPE op = (OP_TYPE)codeobject->codes[ptr++];
-        PARAM_VALUE_TYPE param1 = this->pickParam(codeobject, ptr);
-        PARAM_VALUE_TYPE param2 = this->pickParam(codeobject, ptr);
+        OP_TYPE op = codeobject->pickOP(ptr);
+        PARAM_VALUE_TYPE param1 = codeobject->pickParam(ptr);
+        PARAM_VALUE_TYPE param2 = codeobject->pickParam(ptr);
         PARAM_VALUE_TYPE param3 = 0;
 
         Object* value2  = nullptr;
         if (IS_CONST_PARAM(param2))
         {
-            value2 = codeobject->consts[TS_CONST_PARAM(param2)];
+            value2 = codeobject->g_consts[TS_CONST_PARAM(param2)];
         }
         else
         {
-            KASA_ASSERT(frame.variables[param2], (codeobject->variables[param2]->toString() + " has not been init.").c_str());
+            KASA_ASSERT(frame.variables[param2], (codeobject->g_variables[param2]->toString() + " has not been init.").c_str());
             value2 = frame.variables[param2];
         }
 
@@ -174,15 +174,15 @@ void Interpreter::execute(const ObjectCode* codeobject)
         if (IS_TRI_PARAM(op))
         {
              // get the third param.
-            param3 = this->pickParam(codeobject, ptr);
+            param3 = codeobject->pickParam(ptr);
 
             if (IS_CONST_PARAM(param3))
             {
-                value3 = codeobject->consts[TS_CONST_PARAM(param3)];
+                value3 = codeobject->g_consts[TS_CONST_PARAM(param3)];
             }
             else
             {
-                KASA_ASSERT(frame.variables[param3], (codeobject->variables[param3]->toString() + " has not been init.").c_str());
+                KASA_ASSERT(frame.variables[param3], (codeobject->g_variables[param3]->toString() + " has not been init.").c_str());
                 value3 = frame.variables[param3];
             }
         }
@@ -201,7 +201,7 @@ void Interpreter::execute(const ObjectCode* codeobject)
         case OP_DIV:
             std::cout << "xxx" << value2 << ":" << value3 << " " << param1 << " " << frame.variables.size() << std::endl;
             frame.variables[param1] = _opArithmetical(op, value2, value3);// value2.opAdd(value3);
-            std::cout << *codeobject->variables[param1]<< std::endl;
+            std::cout << *codeobject->g_variables[param1]<< std::endl;
             break;
         }
     }
