@@ -50,7 +50,7 @@ int main()
     yyparse();
     yy_delete_buffer(code);
 
-    programBlock->genCodes(nullptr);
+    //programBlock->genCodes(nullptr);
     
     //programBlock->processVariableList(nullptr);
     delete programBlock;

@@ -17,10 +17,16 @@
 
 class ASTBlock;
 class ASTChunk;
+class ASTIdentifier;
+class ASTStatement;
+class ASTExpression;
+typedef std::vector<ASTStatement *> StatementList;
+typedef std::vector<ASTExpression *> ExpressionList;
+typedef std::vector<ASTIdentifier *> VariableList;
 
 class AST
 {
-  public:
+public:
 	virtual ~AST()
 	{
 	}
@@ -52,7 +58,7 @@ class AST
 
 	virtual void genCodes(ObjectCode *codeobject){};
 
-  protected:
+protected:
 	int m_index = -1;
 };
 
@@ -66,7 +72,7 @@ class ASTStatement : public AST
 
 class ASTIdentifier : public ASTExpression
 {
-  public:
+public:
 	ASTIdentifier(const std::string &value) : m_value(value)
 	{
 	}
@@ -90,14 +96,14 @@ class ASTIdentifier : public ASTExpression
 	virtual void genCodes(ObjectCode *codeobject);
 	virtual void processVariableList(ASTBlock *block);
 
-  protected:
+protected:
 	ObjectString m_value;
 	int m_variableIndex = -1;
 };
 
 class ASTInteger : public ASTExpression
 {
-  public:
+public:
 	ASTInteger(const int &value)
 	{
 		m_value = new ObjectInteger(value);
@@ -122,13 +128,13 @@ class ASTInteger : public ASTExpression
 	virtual void genCodes(ObjectCode *codeobject);
 	virtual void processVariableList(ASTBlock *block);
 
-  protected:
+protected:
 	ObjectInteger *m_value;
 };
 
 class ASTDecimal : public ASTExpression
 {
-  public:
+public:
 	ASTDecimal(const double &value) : m_value(value)
 	{
 	}
@@ -150,13 +156,13 @@ class ASTDecimal : public ASTExpression
 
 	virtual void processVariableList(ASTBlock *block);
 
-  protected:
+protected:
 	ObjectDecimal m_value;
 };
 
 class ASTString : public ASTExpression
 {
-  public:
+public:
 	ASTString(const std::string &value) : m_value(value)
 	{
 	}
@@ -176,15 +182,15 @@ class ASTString : public ASTExpression
 
 	virtual void processVariableList(ASTBlock *block);
 
-  protected:
+protected:
 	ObjectString m_value;
 };
 
 class ASTAssignment : public ASTExpression
 {
-  public:
+public:
 	ASTAssignment(AST *left, AST *right) : m_left(left),
-										   m_right(right)
+																				 m_right(right)
 	{
 	}
 	~ASTAssignment();
@@ -204,17 +210,17 @@ class ASTAssignment : public ASTExpression
 	virtual void genCodes(ObjectCode *codeobject);
 	virtual void processVariableList(ASTBlock *block);
 
-  protected:
+protected:
 	AST *m_left;
 	AST *m_right;
 };
 
 class ASTBinaryOp : public ASTExpression
 {
-  public:
+public:
 	ASTBinaryOp(int op, AST *left, AST *right) : m_op(op),
-												 m_left(left),
-												 m_right(right)
+																							 m_left(left),
+																							 m_right(right)
 	{
 	}
 	~ASTBinaryOp();
@@ -229,14 +235,14 @@ class ASTBinaryOp : public ASTExpression
 		std::cout << getTypeName() << " >>> " << std::endl;
 		m_left->debug();
 		std::cout << "op"
-				  << " " << m_op << std::endl;
+							<< " " << m_op << std::endl;
 		m_right->debug();
 	}
 
 	virtual void genCodes(ObjectCode *codeobject);
 	virtual void processVariableList(ASTBlock *block);
 
-  protected:
+protected:
 	int m_op;
 	AST *m_left;
 	AST *m_right;
@@ -247,7 +253,7 @@ class ASTBinaryOp : public ASTExpression
 */
 class ASTChunk : public ASTExpression
 {
-  public:
+public:
 	ASTChunk()
 	{
 	}
@@ -274,13 +280,13 @@ class ASTChunk : public ASTExpression
 	virtual void genCodes(ObjectCode *codeobject);
 	virtual void processVariableList(ASTBlock *block);
 
-  protected:
+protected:
 	std::vector<AST *> m_expressions;
 };
 
 class ASTBlock : public AST
 {
-  public:
+public:
 	ASTBlock()
 	{
 	}
@@ -351,7 +357,7 @@ class ASTBlock : public AST
 		}
 	}
 
-  protected:
+protected:
 	std::vector<ASTChunk *> m_chunks;
 	ASTBlock *m_parentBlock;
 	ObjectCode *m_codeObject;
@@ -359,7 +365,7 @@ class ASTBlock : public AST
 
 class ASTExpressionStatement : public ASTExpression
 {
-  public:
+public:
 	virtual void debug()
 	{
 		m_expression->debug();
@@ -378,8 +384,35 @@ class ASTExpressionStatement : public ASTExpression
 	virtual void genCodes(ObjectCode *codeobject);
 	virtual void processVariableList(ASTBlock *block);
 
-  protected:
+protected:
 	ASTExpression *m_expression;
+};
+
+class ASTFunctionDeclaration : public ASTExpression
+{
+public:
+	ASTFunctionDeclaration(ASTIdentifier *name, VariableList *arguments, ASTChunk *chunk) : m_name(name),
+																																				m_arguments(arguments)
+	{
+		std::cout << "function args: " << arguments->size()<< std::endl;
+		m_block = new ASTBlock();
+		m_block->pushBack(chunk);
+
+		for (auto it : *arguments)
+		{
+			std::cout << "function args: " << it->getTypeName() << std::endl;
+		}
+	}
+
+	virtual std::string getTypeName()
+	{
+		return "ASTFunctionDeclaration";
+	}
+
+protected:
+	ASTIdentifier *m_name;
+	VariableList *m_arguments;
+	ASTBlock *m_block;
 };
 
 /**
@@ -387,7 +420,7 @@ class ASTExpressionStatement : public ASTExpression
 */
 class ASTModule : public ASTBlock
 {
-  public:
+public:
 	ASTModule()
 	{
 	}

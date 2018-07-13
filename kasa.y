@@ -54,6 +54,7 @@
 %token <token> TRETURN TEXTERN
 %token <token> TFOR TWHILE TIF TELSE
 %token <token> TEXPREND
+%token <token> TFUNCTION
 
 /* Define the type of node our nonterminal symbols represent.
    The types refer to the %union declaration above. Ex: when
@@ -62,8 +63,9 @@
  */
 %type <ident> ident
 %type <expr> numeric expr id_or_expr 
+%type <varvec> func_decl_args
 %type <chunk> program stmts chunk
-%type <stmt> stmt 
+%type <stmt> stmt func_decl
 %type <token> comparison
 
 /* Operator precedence for mathematical operators */
@@ -77,6 +79,9 @@
 program : stmts {programBlock->pushBack($1); }
 		//| chunk { programBlock = $1; }
 		;
+
+ident : TIDENTIFIER { $$ = new ASTIdentifier(*$1); delete $1; }
+	  	;
 		
 stmts : stmt { $$ = new ASTChunk(); $$->pushBack($<stmt>1); }
 	  	| stmts stmt { $1->pushBack($<stmt>2); }
@@ -84,13 +89,19 @@ stmts : stmt { $$ = new ASTChunk(); $$->pushBack($<stmt>1); }
 
 stmt : expr TEXPREND { $$ = new ASTExpressionStatement($1); }
 		| chunk {$$ = $1;}
+		| func_decl {$$ = $1;}
 		;
+
+func_decl : TFUNCTION ident '(' func_decl_args ')' chunk { $$ = new ASTFunctionDeclaration($2, $4, $6);}
+		  ;
+
+func_decl_args : /*blank*/  { $$ = new VariableList(); }
+		  | ident { $$ = new VariableList(); $$->push_back($<ident>1); }
+		  | func_decl_args TCOMMA ident { $1->push_back($<ident>3); }
+		  ;
 
 chunk : TLBRACE stmts TRBRACE { $$ = $2; }
 	  	| TLBRACE TRBRACE { $$ = new ASTChunk(); }
-	  	;
-
-ident : TIDENTIFIER { $$ = new ASTIdentifier(*$1); delete $1; }
 	  	;
 
 numeric : TINTEGER { $$ = new ASTInteger(atoi($1->c_str())); delete $1; }
