@@ -20,7 +20,7 @@ ASTIdentifier::~ASTIdentifier()
 
 void ASTIdentifier::genCodes(ObjectCode *codeobject)
 {
-    m_index = codeobject->addVar(&m_value);
+    m_index = codeobject->addVar(m_value);
 }
 
 void ASTIdentifier::processVariableList(ASTBlock *block)
@@ -187,9 +187,16 @@ void ASTExpressionStatement::processVariableList(ASTBlock *block)
     m_expression->processVariableList(block);
 }
 
+void ASTBlock::addGlobalVars(VariableList *vars)
+{
+    for (auto id : *vars)
+    {
+        m_codeObject->addVar(id->getValue());
+    }
+}
+
 void ASTBlock::genCodes(ObjectCode *codeobject)
 {   
-    m_codeObject = new ObjectCode();
     // process consts
     processVariableList(this);
 
@@ -200,4 +207,40 @@ void ASTBlock::genCodes(ObjectCode *codeobject)
 
     Interpreter interpreter;
     interpreter.execute(m_codeObject);
+}
+
+void ASTFunctionDeclaration::genCodes(ObjectCode *codeobject)
+{
+    // add the arguments to the variable list.
+    m_block->addGlobalVars(m_arguments);
+    m_block->genCodes(codeobject);
+
+    int codeIdx = codeobject->addConstVar(m_block->getCodeObject());
+    int varIdx  = codeobject->addVar(m_name->getValue());
+    codeobject->addParamOP(OP_LOAD_CONST);
+    codeobject->addParamVarIndex(varIdx);
+    codeobject->addParamVarIndex(RT_CONST_PARAM(codeIdx));
+}
+
+
+void ASTMethodCall::genCodes(ObjectCode *codeobject)
+{
+    int idx = codeobject->getVarIndex(m_name->getValue());
+    codeobject->addParamOP(OP_SETUP_FUNC);
+    codeobject->addParamVarIndex(idx);
+    codeobject->addParamVarIndex(0);
+
+    int exp_idx = 0;
+    for (ASTExpression* it : *m_expressions)
+    {
+        it->genCodes(codeobject);
+        codeobject->addParamOP(OP_SETUP_PARAM);
+        codeobject->addParamVarIndex(exp_idx++);
+        codeobject->addParamVarIndex(it->getIndex());
+    }
+
+    codeobject->addParamOP(OP_CALL);
+    codeobject->addParamVarIndex(0);
+    codeobject->addParamVarIndex(0);
+    
 }

@@ -11,6 +11,7 @@
 #include "ast.h"
 #include "object.h"
 #include "opcode.h"
+#include "kasa_log.h"
 #include "kasa_assert.h"
 #include "interpreter.h"
 #include "object_code.h"
@@ -24,6 +25,7 @@ extern void yy_delete_buffer(YY_BUFFER_STATE buffer);
 extern ASTModule *programBlock;
 int main()
 {
+    LOG_INFO("%s, %d, %f", "xxxxxlog", 78787, 0.001);
     //KASA_ASSERT(false, "aaaaaaaaaaaaaaaa");
     // ObjectString a("a");
     // ObjectString b("b");
@@ -50,7 +52,7 @@ int main()
     yyparse();
     yy_delete_buffer(code);
 
-    //programBlock->genCodes(nullptr);
+    programBlock->genCodes(nullptr);
     
     //programBlock->processVariableList(nullptr);
     delete programBlock;

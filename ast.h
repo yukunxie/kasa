@@ -73,15 +73,22 @@ class ASTStatement : public AST
 class ASTIdentifier : public ASTExpression
 {
 public:
-	ASTIdentifier(const std::string &value) : m_value(value)
+	ASTIdentifier(const std::string &value)
 	{
+		m_value = new ObjectString(value);
 	}
 
-	ASTIdentifier(const std::string &&value) : m_value(std::forward<const std::string>(value))
+	ASTIdentifier(const std::string &&value)
 	{
+		m_value = new ObjectString(std::forward<const std::string>(value));
 	}
 
 	~ASTIdentifier();
+
+	ObjectString* getValue()
+	{
+		return m_value;
+	}
 
 	virtual std::string getTypeName()
 	{
@@ -90,14 +97,14 @@ public:
 
 	virtual void debug()
 	{
-		std::cout << getTypeName() << " : " << m_value.toString() << std::endl;
+		std::cout << getTypeName() << " : " << m_value->toString() << std::endl;
 	}
 
 	virtual void genCodes(ObjectCode *codeobject);
 	virtual void processVariableList(ASTBlock *block);
 
 protected:
-	ObjectString m_value;
+	ObjectString *m_value;
 	int m_variableIndex = -1;
 };
 
@@ -289,6 +296,7 @@ class ASTBlock : public AST
 public:
 	ASTBlock()
 	{
+        m_codeObject = new ObjectCode();
 	}
 
 	~ASTBlock()
@@ -298,6 +306,8 @@ public:
 			delete it;
 		}
 	};
+
+	void addGlobalVars(VariableList * vars);
 
 	void pushBack(ASTChunk *chunk)
 	{
@@ -357,6 +367,11 @@ public:
 		}
 	}
 
+	ObjectCode* getCodeObject()
+	{
+		return m_codeObject;
+	}
+
 protected:
 	std::vector<ASTChunk *> m_chunks;
 	ASTBlock *m_parentBlock;
@@ -392,16 +407,10 @@ class ASTFunctionDeclaration : public ASTExpression
 {
 public:
 	ASTFunctionDeclaration(ASTIdentifier *name, VariableList *arguments, ASTChunk *chunk) : m_name(name),
-																																				m_arguments(arguments)
+												m_arguments(arguments)
 	{
-		std::cout << "function args: " << arguments->size()<< std::endl;
 		m_block = new ASTBlock();
 		m_block->pushBack(chunk);
-
-		for (auto it : *arguments)
-		{
-			std::cout << "function args: " << it->getTypeName() << std::endl;
-		}
 	}
 
 	virtual std::string getTypeName()
@@ -409,10 +418,28 @@ public:
 		return "ASTFunctionDeclaration";
 	}
 
+	virtual void genCodes(ObjectCode *codeobject);
+	
+
 protected:
 	ASTIdentifier *m_name;
 	VariableList *m_arguments;
 	ASTBlock *m_block;
+};
+
+class ASTMethodCall : public ASTExpression {
+public:
+	ASTMethodCall(ASTIdentifier  *name, ExpressionList *expressions):
+		m_name(name),
+		m_expressions(expressions)
+	{}
+
+	virtual void genCodes(ObjectCode *codeobject);
+
+protected:
+	ASTIdentifier  *m_name;
+	ExpressionList *m_expressions;
+    
 };
 
 /**

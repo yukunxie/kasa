@@ -233,6 +233,7 @@ void Interpreter::execute(const ObjectCode* codeobject)
         }
         else
         {
+            std::cout << param2 << std::endl;
             KASA_ASSERT(frame.variables.size() > param2 && frame.variables[param2], (codeobject->g_variables[param2]->toString() + " has not been init.").c_str());
             value2 = frame.variables[param2];
         }
@@ -256,12 +257,14 @@ void Interpreter::execute(const ObjectCode* codeobject)
 
         //std::cout << "params: " << (int)param1 << " " << (int)param2 << " " << (int)param3 << std::endl;
 
+        std::cout << "op: " << op << std::endl;
         switch(op)
         {
         case OP_LOAD_CONST:
             while(frame.variables.size() <= param1) frame.variables.push_back(nullptr);
             frame.variables[param1] = value2;
-            std::cout << codeobject->g_variables[param1]->toString() << " : " << frame.variables[param1]->toString() << std::endl;
+            LOG_INFO("address=%x", value2);
+            //std::cout << "load const:" << param1 << " " << codeobject->g_variables[param1]->toString() << " : " << frame.variables[param1]->toString() << std::endl;
             break;
         case OP_ADD:
         case OP_MUL:

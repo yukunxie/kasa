@@ -54,7 +54,7 @@
 %token <token> TRETURN TEXTERN
 %token <token> TFOR TWHILE TIF TELSE
 %token <token> TEXPREND
-%token <token> TFUNCTION
+%token <token> TFUNCTION TPRINT
 
 /* Define the type of node our nonterminal symbols represent.
    The types refer to the %union declaration above. Ex: when
@@ -62,8 +62,9 @@
    calling an (NIdentifier*). It makes the compiler happy.
  */
 %type <ident> ident
-%type <expr> numeric expr id_or_expr 
+%type <expr> numeric expr id_or_expr ex_expr
 %type <varvec> func_decl_args
+%type <exprvec> call_args
 %type <chunk> program stmts chunk
 %type <stmt> stmt func_decl
 %type <token> comparison
@@ -87,7 +88,7 @@ stmts : stmt { $$ = new ASTChunk(); $$->pushBack($<stmt>1); }
 	  	| stmts stmt { $1->pushBack($<stmt>2); }
 		;
 
-stmt : expr TEXPREND { $$ = new ASTExpressionStatement($1); }
+stmt : ex_expr TEXPREND { $$ = new ASTExpressionStatement($1); }
 		| chunk {$$ = $1;}
 		| func_decl {$$ = $1;}
 		;
@@ -108,19 +109,28 @@ numeric : TINTEGER { $$ = new ASTInteger(atoi($1->c_str())); delete $1; }
 		| TDOUBLE { $$ = new ASTDecimal(atof($1->c_str())); delete $1; }
 		;
 
+ex_expr: ident TEQUAL id_or_expr { $$ = new ASTAssignment($<ident>1, $3); }
+		| expr {$$ = $1;}
+		;
+
 id_or_expr : expr { $$ = $1; }
 		| ident  { $$ = $1; }
 		;
-	
-expr : ident TEQUAL id_or_expr { $$ = new ASTAssignment($<ident>1, $3); }
-	 	| numeric
+
+expr :    numeric { $$ = $1; }
         | id_or_expr TMUL id_or_expr { $$ = new ASTBinaryOp($2, $1, $3); }
         | id_or_expr TDIV id_or_expr { $$ = new	ASTBinaryOp($2, $1, $3); }
         | id_or_expr TPLUS id_or_expr { $$ = new ASTBinaryOp($2, $1, $3); }
         | id_or_expr TMINUS id_or_expr { $$ = new ASTBinaryOp($2, $1, $3); }
  	 	| id_or_expr comparison id_or_expr { $$ = new ASTBinaryOp($2, $1, $3); }
      	| '(' id_or_expr ')' { $$ = $2; }
+		| ident '(' call_args ')' { $$ = new ASTMethodCall($1, $3); }
 	 	;
+
+call_args : /*blank*/  { $$ = new ExpressionList(); }
+		  | expr { $$ = new ExpressionList(); $$->push_back($1); }
+		  | call_args TCOMMA expr  { $1->push_back($3); }
+		  ;
 
 comparison : TCEQ 
 		| TCNE 

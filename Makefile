@@ -10,6 +10,7 @@ OBJS = kasa_parser.o  	\
 	   ast.o 			\
 	   object.o 		\
 	   kasa_assert.o 	\
+	   kasa_log.o		\
 	   interpreter.o 	\
 	   object_code.o	\
 

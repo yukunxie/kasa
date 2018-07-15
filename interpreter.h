@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "kasa_assert.h"
+#include "kasa_log.h"
 #include "object_code.h"
 
 struct Frame

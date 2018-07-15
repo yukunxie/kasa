@@ -5,6 +5,9 @@ enum OP_TYPE
 {
     OP_NULL,
 
+    OP_SETUP_FUNC,
+    OP_SETUP_PARAM,
+
     OP_LOAD_CONST,
     OP_MOVE,
     OP_TWO_PARAM, // 两个参数  op a, b
@@ -13,6 +16,7 @@ enum OP_TYPE
     OP_SUB,
     OP_MUL,
     OP_DIV,
+    OP_CALL,
     OP_TRI_PARAM, // 三个参数 op a, b, c
 
     OP_COUNT

@@ -49,6 +49,7 @@ void saveLocation()
 "if"							return TOKEN(TIF);
 "else"							return TOKEN(TELSE);
 "func"							return TOKEN(TFUNCTION);
+"print"							return TOKEN(TPRINT);
 [a-zA-Z_][a-zA-Z0-9_]*  SAVE_TOKEN; return TIDENTIFIER;
 [+|-]?[0-9]+\.[0-9]* 			    SAVE_TOKEN; return TDOUBLE;
 [+|-]?[0-9]+					        SAVE_TOKEN; return TINTEGER;
