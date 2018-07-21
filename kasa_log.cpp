@@ -1,4 +1,5 @@
 #include "kasa_log.h"
+#include <stdarg.h>
 #include <ctime>
 #include <chrono>
 

@@ -82,7 +82,10 @@ OP_TYPE ObjectCode::pickOP(size_t &codeptr) const
 
 PARAM_VALUE_TYPE ObjectCode::pickParam(size_t &codeptr) const
 {
-	std::cout << "pick param:" << g_codes.size() << " " << codeptr << std::endl;
+	if (g_codes.size() <= codeptr)
+	{
+		std::cout << "pick param:" << g_codes.size() << " " << codeptr << std::endl;
+	}
 	KASA_ASSERT(g_codes.size() >= codeptr + 2, "invalid codeobject");
 	// little endian
 	PARAM_VALUE_TYPE value = (PARAM_VALUE_TYPE)g_codes[codeptr++] + (((PARAM_VALUE_TYPE)g_codes[codeptr++]) << 8);

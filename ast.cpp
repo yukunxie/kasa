@@ -1,6 +1,6 @@
 #include "ast.h"
 #include "interpreter.h"
-#include "kasa_parser.hpp"
+#include "kasa.tab.hpp"
 
 #include <stdio.h>
 #include <unordered_map>
@@ -205,8 +205,9 @@ void ASTBlock::genCodes(ObjectCode *codeobject)
         it->genCodes(m_codeObject);
     }
 
-    Interpreter interpreter;
-    interpreter.execute(m_codeObject);
+    //Interpreter interpreter;
+    //auto next_frame = new Frame;
+    //interpreter.execute(next_frame, m_codeObject);
 }
 
 void ASTFunctionDeclaration::genCodes(ObjectCode *codeobject)

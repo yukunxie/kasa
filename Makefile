@@ -4,9 +4,9 @@ OUTPUT= ./debug
 
 all: kasa
 
-OBJS = kasa_parser.o  	\
+OBJS = kasa.tab.o  	\
        main.o    		\
-       kasa_tokens.o  	\
+       lex.o  	\
 	   ast.o 			\
 	   object.o 		\
 	   kasa_assert.o 	\
@@ -17,15 +17,14 @@ OBJS = kasa_parser.o  	\
 main: main.o
 	$(CXX) -o main main.o $(CXXFLAGS)
 
-kasa_parser.cpp: kasa.y
+kasa.tab.cpp: kasa.y
 	bison -d -o $@ $^
 
-kasa_tokens.cpp: kasa.l ast.h
-	flex -o $@ $^ 
-
+lex.cpp: kasa.l ast.h
+	flex --nounistd -o $@ $^ 
 
 kasa: $(OBJS)
 	$(CXX) -o $@ $(OBJS) $(CXXFLAGS)
 
 clean:
-	rm -rf *.o kasa kasa_parser.cpp kasa_parser.hpp  kasa_tokens.cpp
+	rm -rf *.o kasa  lex.* kasa.tab.*

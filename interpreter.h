@@ -14,7 +14,7 @@ struct Frame
 class Interpreter
 {
   public:
-    void execute(const ObjectCode *codeobject);
+    void execute(Frame *frame, const ObjectCode *codeobject);
 };
 
 #endif

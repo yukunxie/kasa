@@ -16,6 +16,10 @@ static const PARAM_VALUE_TYPE CONST_IDX_START = 1 << (sizeof(PARAM_VALUE_TYPE) *
 class ObjectCode : public Object
 {
   public:
+	virtual std::string getTypeName() const
+	{
+		return "ObjectCode";
+	}
     int getVarIndex(const ObjectString *variable);
     int addVar(ObjectString *variable);
     int getConstVarIndex(const Object *constVar);

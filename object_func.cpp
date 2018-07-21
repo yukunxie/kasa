@@ -1,4 +1,4 @@
-#include "object_code.h"
+#include "object_func.h"
 
 int ObjectCode::getVarIndex(const ObjectString *variable)
 {

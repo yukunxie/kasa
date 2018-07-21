@@ -3,6 +3,12 @@
 #include <stdint.h>
 #include "ast.h"
 
+#ifdef UNIX
+#include <unistd.h>
+#else
+#include <io.h>
+#endif
+
 #define SAVE_TOKEN  yylval.string = new std::string(yytext, yyleng)
 #define TOKEN(t)    (yylval.token = t)
 
@@ -20,7 +26,7 @@ typedef struct YYLTYPE
 
 int yycolumn = 1;
 
-#include "kasa_parser.hpp"
+#include "kasa.tab.hpp"
 
 void saveLocation()
 {

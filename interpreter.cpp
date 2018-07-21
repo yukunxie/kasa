@@ -214,11 +214,13 @@ Object* _opBitset(const Object* a, const Object* b)
     return nullptr;
 }
 
-void Interpreter::execute(const ObjectCode* codeobject)
+void Interpreter::execute(Frame *frame, const ObjectCode* codeobject)
 {
-    Frame frame;
-
     size_t ptr = 0;
+
+    Frame *next_frame = nullptr;
+    ObjectCode* next_codeobject = nullptr;
+
     while (ptr < codeobject->g_codes.size())
     {
         OP_TYPE op = codeobject->pickOP(ptr);
@@ -233,9 +235,9 @@ void Interpreter::execute(const ObjectCode* codeobject)
         }
         else
         {
-            std::cout << param2 << std::endl;
-            KASA_ASSERT(frame.variables.size() > param2 && frame.variables[param2], (codeobject->g_variables[param2]->toString() + " has not been init.").c_str());
-            value2 = frame.variables[param2];
+            //std::cout << param2 <<  " xxxx " << frame.variables[param2] << std::endl;
+            KASA_ASSERT(frame->variables.size() > param2 && frame->variables[param2], (codeobject->g_variables[param2]->toString() + " has not been init.").c_str());
+            value2 = frame->variables[param2];
         }
 
         Object* value3  = nullptr;
@@ -250,8 +252,8 @@ void Interpreter::execute(const ObjectCode* codeobject)
             }
             else
             {
-                KASA_ASSERT(frame.variables[param3], (codeobject->g_variables[param3]->toString() + " has not been init.").c_str());
-                value3 = frame.variables[param3];
+                KASA_ASSERT(frame->variables[param3], (codeobject->g_variables[param3]->toString() + " has not been init.").c_str());
+                value3 = frame->variables[param3];
             }
         }
 
@@ -261,19 +263,44 @@ void Interpreter::execute(const ObjectCode* codeobject)
         switch(op)
         {
         case OP_LOAD_CONST:
-            while(frame.variables.size() <= param1) frame.variables.push_back(nullptr);
-            frame.variables[param1] = value2;
-            LOG_INFO("address=%x", value2);
+            while(frame->variables.size() <= param1) frame->variables.push_back(nullptr);
+            frame->variables[param1] = value2;
+            LOG_INFO("address=%s", value2->getTypeName().c_str());
             //std::cout << "load const:" << param1 << " " << codeobject->g_variables[param1]->toString() << " : " << frame.variables[param1]->toString() << std::endl;
             break;
         case OP_ADD:
         case OP_MUL:
         case OP_SUB:
         case OP_DIV:
-             while(frame.variables.size() <= param1) frame.variables.push_back(nullptr);
-            frame.variables[param1] = _opArithmetical(op, value2, value3);// value2.opAdd(value3);
+             while(frame->variables.size() <= param1) frame->variables.push_back(nullptr);
+            frame->variables[param1] = _opArithmetical(op, value2, value3);// value2.opAdd(value3);
             //std::cout << "xxx" << value2->toString() << ":" << value3->toString() << " " << param1 << " " << frame.variables[param1]->toString() << std::endl;
             //std::cout << *codeobject->g_variables[param1]<< std::endl;
+            break;
+        case OP_SETUP_FUNC:
+            next_codeobject = (ObjectCode*)(frame->variables[param1]);
+            if (next_frame)delete next_frame;
+            next_frame = new Frame;
+            //std::cout << "op_setup_func " << param1 << std::endl;;
+            break;
+
+        case OP_CALL:
+            Interpreter _tmp;
+            std::cout << "xxxxkkkk" << std::endl;
+            _tmp.execute(next_frame, next_codeobject);
+            std::cout << "op_setup_param:" << next_codeobject->g_codes.size()<< std::endl;;
+            break;
+
+        case OP_SETUP_PARAM:
+			if (IS_CONST_PARAM(param2))
+			{
+				auto value = codeobject->g_consts[TS_CONST_PARAM(param2)];
+				next_frame->variables.push_back(value);
+			}
+			else
+			{
+				next_frame->variables.push_back(frame->variables[param2]);
+			}
             break;
         }
     }

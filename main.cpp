@@ -44,8 +44,10 @@ int main()
 
     // cout << a << " " << b << " " << i << " " << b.getType() << endl;
 
-    std::ifstream ifs("test1.ks");
+    std::ifstream ifs("G:\\Realxie\\kasa\\test1.ks");
     std::string content((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
+
+	std::cout << "code:" << content << std::endl;
 
     //char string[] = "{a = (b / 10); c = a + b;}";
     YY_BUFFER_STATE code = yy_scan_string(content.c_str());
@@ -53,6 +55,10 @@ int main()
     yy_delete_buffer(code);
 
     programBlock->genCodes(nullptr);
+
+	Interpreter it;
+	Frame frame;
+	it.execute(&frame, programBlock->getCodeObject());
     
     //programBlock->processVariableList(nullptr);
     delete programBlock;
