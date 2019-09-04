@@ -3,106 +3,34 @@
 #include "interpreter.h"
 #include "opcode.h"
 
-Object* operator + (const ObjectInteger& a, const ObjectInteger& b)
-{
-    int value = a.getValue() + b.getValue();
-    return new ObjectInteger(value);
+#define DECLARE_BINARY_OP_TEMPLATE(Op)                              \
+template<typename _Tp1, typename _Tp2>                              \
+decltype(auto) operator Op(const _Tp1&a, const _Tp2& b)              \
+{                                                                   \
+    auto value = a.getValue() Op b.getValue();                       \
+    return CreateObjectHelper<decltype(value)>::createObject(value);\
 }
 
-Object* operator - (const ObjectInteger& a, const ObjectInteger& b)
+template<typename _Tp>
+struct CreateObjectHelper
 {
-    int value = a.getValue() - b.getValue();
-    return new ObjectInteger(value);
-}
+    static Object* createObject(const _Tp& value)
+    {
+        return new (typename ObjectTypeTriats<_Tp>::ObjectType)(value);
+    }
+};
 
-Object* operator * (const ObjectInteger& a, const ObjectInteger& b)
-{
-    int value = a.getValue() * b.getValue();
-    return new ObjectInteger(value);
-}
-
-Object* operator / (const ObjectInteger& a, const ObjectInteger& b)
-{
-    KASA_ASSERT(b.getValue() != 0, "divisor can not be zero.");
-    int value = a.getValue() / b.getValue();
-    return new ObjectInteger(value);
-}
-
-Object* operator + (const ObjectDecimal& a, const ObjectDecimal& b)
-{
-    double value = a.getValue() + b.getValue();
-    return new ObjectDecimal(value);
-}
-
-Object* operator - (const ObjectDecimal& a, const ObjectDecimal& b)
-{
-    double value = a.getValue() - b.getValue();
-    return new ObjectDecimal(value);
-}
-
-Object* operator * (const ObjectDecimal& a, const ObjectDecimal& b)
-{
-    double value = a.getValue() * b.getValue();
-    return new ObjectDecimal(value);
-}
-
-Object* operator / (const ObjectDecimal& a, const ObjectDecimal& b)
-{
-    KASA_ASSERT(b.getValue() != 0.0, "divisor can not be zero.");
-    double value = a.getValue() / b.getValue();
-    return new ObjectDecimal(value);
-}
-
-Object* operator + (const ObjectInteger& a, const ObjectDecimal& b)
-{
-    double value = a.getValue() + b.getValue();
-    return new ObjectDecimal(value);
-}
-
-Object* operator - (const ObjectInteger& a, const ObjectDecimal& b)
-{
-    double value = a.getValue() - b.getValue();
-    return new ObjectDecimal(value);
-}
-
-Object* operator * (const ObjectInteger& a, const ObjectDecimal& b)
-{
-    double value = a.getValue() * b.getValue();
-    return new ObjectDecimal(value);
-}
-
-Object* operator / (const ObjectInteger& a, const ObjectDecimal& b)
-{
-    KASA_ASSERT(b.getValue() != 0.0, "divisor can not be zero.");
-    double value = a.getValue() / b.getValue();
-    return new ObjectDecimal(value);
-}
-
-Object* operator + (const ObjectDecimal& a, const ObjectInteger& b)
-{
-    double value = a.getValue() + b.getValue();
-    return new ObjectDecimal(value);
-}
-
-Object* operator - (const ObjectDecimal& a, const ObjectInteger& b)
-{
-    double value = a.getValue() - b.getValue();
-    return new ObjectDecimal(value);
-}
-
-Object* operator * (const ObjectDecimal& a, const ObjectInteger& b)
-{
-    double value = a.getValue() * b.getValue();
-    return new ObjectDecimal(value);
-}
-
-Object* operator / (const ObjectDecimal& a, const ObjectInteger& b)
-{
-    KASA_ASSERT(b.getValue() != 0.0, "divisor can not be zero.");
-    double value = a.getValue() / b.getValue();
-    return new ObjectDecimal(value);
-}
-
+// declare binary opertion on objects.
+DECLARE_BINARY_OP_TEMPLATE(+)
+DECLARE_BINARY_OP_TEMPLATE(-)
+DECLARE_BINARY_OP_TEMPLATE(*)
+DECLARE_BINARY_OP_TEMPLATE(/)
+DECLARE_BINARY_OP_TEMPLATE(<)
+DECLARE_BINARY_OP_TEMPLATE(<=)
+DECLARE_BINARY_OP_TEMPLATE(>=)
+DECLARE_BINARY_OP_TEMPLATE(>)
+DECLARE_BINARY_OP_TEMPLATE(==)
+DECLARE_BINARY_OP_TEMPLATE(!=)
 
 Object* _opArithmetical(OP_TYPE op, const Object* a, const Object* b)
 {
@@ -214,6 +142,18 @@ Object* _opBitset(const Object* a, const Object* b)
     return nullptr;
 }
 
+#define LOAD_VALUE_BY_PARAM(param, value)                          \
+do{                                                         \
+    if (IS_CONST_PARAM(param))                              \
+    {                                                       \
+    value = codeobject->g_consts[TS_CONST_PARAM(param)];   \
+    }                                                       \
+    else                                                    \
+    {                                                       \
+    value = frame->variables[param];                       \
+    }                                                       \
+} while (0)
+
 void Interpreter::execute(Frame *frame, const ObjectCode* codeobject)
 {
     size_t ptr = 0;
@@ -224,84 +164,107 @@ void Interpreter::execute(Frame *frame, const ObjectCode* codeobject)
     while (ptr < codeobject->g_codes.size())
     {
         OP_TYPE op = codeobject->pickOP(ptr);
-        PARAM_VALUE_TYPE param1 = codeobject->pickParam(ptr);
-        PARAM_VALUE_TYPE param2 = codeobject->pickParam(ptr);
+        PARAM_VALUE_TYPE param1 = 0;
+        PARAM_VALUE_TYPE param2 = 0;
         PARAM_VALUE_TYPE param3 = 0;
-
+        
+        Object* value1  = nullptr;
         Object* value2  = nullptr;
-        if (IS_CONST_PARAM(param2))
-        {
-            value2 = codeobject->g_consts[TS_CONST_PARAM(param2)];
-        }
-        else
-        {
-            //std::cout << param2 <<  " xxxx " << frame.variables[param2] << std::endl;
-            KASA_ASSERT(frame->variables.size() > param2 && frame->variables[param2], (codeobject->g_variables[param2]->toString() + " has not been init.").c_str());
-            value2 = frame->variables[param2];
-        }
-
         Object* value3  = nullptr;
+        
+        if (IS_ONE_PARAM(op) || IS_TWO_PARAM(op) || IS_TRI_PARAM(op))
+        {
+            param1 = codeobject->pickParam(ptr);
+        }
+        
+        if (IS_TWO_PARAM(op) || IS_TRI_PARAM(op))
+        {
+            param2 = codeobject->pickParam(ptr);
+            LOAD_VALUE_BY_PARAM(param2, value2);
+        }
+        
         if (IS_TRI_PARAM(op))
         {
-             // get the third param.
             param3 = codeobject->pickParam(ptr);
-
-            if (IS_CONST_PARAM(param3))
-            {
-                value3 = codeobject->g_consts[TS_CONST_PARAM(param3)];
-            }
-            else
-            {
-                KASA_ASSERT(frame->variables[param3], (codeobject->g_variables[param3]->toString() + " has not been init.").c_str());
-                value3 = frame->variables[param3];
-            }
+            LOAD_VALUE_BY_PARAM(param3, value3);
         }
-
-        //std::cout << "params: " << (int)param1 << " " << (int)param2 << " " << (int)param3 << std::endl;
 
         std::cout << "op: " << op << std::endl;
         switch(op)
         {
-        case OP_LOAD_CONST:
-            while(frame->variables.size() <= param1) frame->variables.push_back(nullptr);
-            frame->variables[param1] = value2;
-            LOG_INFO("address=%s", value2->getTypeName().c_str());
-            //std::cout << "load const:" << param1 << " " << codeobject->g_variables[param1]->toString() << " : " << frame.variables[param1]->toString() << std::endl;
-            break;
-        case OP_ADD:
-        case OP_MUL:
-        case OP_SUB:
-        case OP_DIV:
-             while(frame->variables.size() <= param1) frame->variables.push_back(nullptr);
-            frame->variables[param1] = _opArithmetical(op, value2, value3);// value2.opAdd(value3);
-            //std::cout << "xxx" << value2->toString() << ":" << value3->toString() << " " << param1 << " " << frame.variables[param1]->toString() << std::endl;
-            //std::cout << *codeobject->g_variables[param1]<< std::endl;
-            break;
-        case OP_SETUP_FUNC:
-            next_codeobject = (ObjectCode*)(frame->variables[param1]);
-            if (next_frame)delete next_frame;
-            next_frame = new Frame;
-            //std::cout << "op_setup_func " << param1 << std::endl;;
-            break;
+            case OP_RETURN:
+            {
+                return;
+            }
+            case OP_RETURN_PARAM_SETUP:
+            {
+                LOAD_VALUE_BY_PARAM(param1, value1);
+                frame->retVariables.push_back(value1);
+                break;
+            }
+            
+            case OP_LOAD_CONST:
+            {
+                while(frame->variables.size() <= param1) frame->variables.push_back(nullptr);
+                frame->variables[param1] = value2;
+                LOG_INFO("address=%s", value2->getTypeName().c_str());
+                //std::cout << "load const:" << param1 << " " << codeobject->g_variables[param1]->toString() << " : " << frame.variables[param1]->toString() << std::endl;
+                break;
+            }
+            
+            case OP_ADD:
+            case OP_MUL:
+            case OP_SUB:
+            case OP_DIV:
+            {
+                while(frame->variables.size() <= param1) frame->variables.push_back(nullptr);
+                frame->variables[param1] = _opArithmetical(op, value2, value3);// value2.opAdd(value3);
+                //std::cout << "xxx" << value2->toString() << ":" << value3->toString() << " " << param1 << " " << frame.variables[param1]->toString() << std::endl;
+                //std::cout << *codeobject->g_variables[param1]<< std::endl;
+                break;
+            }
+            case OP_SETUP_FUNC:
+            {
+                next_codeobject = (ObjectCode*)(frame->variables[param1]);
+                if (next_frame)delete next_frame;
+                next_frame = new Frame;
+                //std::cout << "op_setup_func " << param1 << std::endl;;
+                break;
+            }
 
-        case OP_CALL:
-            Interpreter _tmp;
-            std::cout << "xxxxkkkk" << std::endl;
-            _tmp.execute(next_frame, next_codeobject);
-            std::cout << "op_setup_param:" << next_codeobject->g_codes.size()<< std::endl;;
-            break;
+            case OP_CALL:
+            {
+                Interpreter _tmp;
+                _tmp.execute(next_frame, next_codeobject);
+#if NDEBUG
+                std::cout << "return values: " << next_frame->retVariables.size() << std::endl;
+                for (int i = 0; i < next_frame->retVariables.size(); ++i)
+                {
+                    printf("\t>>> [%d] = %s\n", i, next_frame->retVariables[i]->toString().c_str());
+                }
+#endif
+                break;
+            }
 
-        case OP_SETUP_PARAM:
-			if (IS_CONST_PARAM(param2))
-			{
-				auto value = codeobject->g_consts[TS_CONST_PARAM(param2)];
-				next_frame->variables.push_back(value);
-			}
-			else
-			{
-				next_frame->variables.push_back(frame->variables[param2]);
-			}
-            break;
+            case OP_SETUP_PARAM:
+            {
+                if (IS_CONST_PARAM(param2))
+                {
+                    auto value = codeobject->g_consts[TS_CONST_PARAM(param2)];
+                    next_frame->variables.push_back(value);
+                }
+                else
+                {
+                    next_frame->variables.push_back(frame->variables[param2]);
+                }
+                break;
+            }
+            
+            default:
+            {
+                std::cout << "unprocessed opcode: " << op << std::endl;
+                break;
+            }
         }
     }
 }

@@ -9,6 +9,7 @@
 struct Frame
 {
     std::vector<Object *> variables;
+    std::vector<Object *> retVariables;
 };
 
 class Interpreter

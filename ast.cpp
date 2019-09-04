@@ -94,6 +94,23 @@ void ASTAssignment::processVariableList(ASTBlock *block)
     }
 }
 
+void ASTReturnExpression::genCodes(ObjectCode *codeobject)
+{
+    for (auto it : m_exprs)
+    {
+        it->genCodes(codeobject);
+        auto index = it->getIndex();
+        codeobject->addParamOP(OP_TYPE::OP_RETURN_PARAM_SETUP);
+        codeobject->addParamVarIndex(index);
+    }
+    codeobject->addParamOP(OP_TYPE::OP_RETURN);
+}
+
+void ASTReturnExpression::appendExrepssion(ASTExpression* expr)
+{
+    m_exprs.push_back(expr);
+}
+
 ASTChunk::~ASTChunk()
 {
     for (auto it : m_expressions)

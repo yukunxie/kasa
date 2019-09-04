@@ -255,6 +255,16 @@ protected:
 	AST *m_right;
 };
 
+class ASTReturnExpression : public ASTExpression
+{
+public:
+    virtual void genCodes(ObjectCode *codeobject) override;
+    void appendExrepssion(ASTExpression* expr);
+    
+protected:
+    ExpressionList m_exprs;
+};
+
 /**
  * a code block in a block
 */

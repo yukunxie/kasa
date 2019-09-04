@@ -1,5 +1,5 @@
 CXX=g++
-CXXFLAGS='-std=c++11' -DNDEBUG -g
+CXXFLAGS='-std=c++17' -DNDEBUG -g
 OUTPUT= ./debug
 
 all: kasa
@@ -19,9 +19,6 @@ main: main.o
 
 kasa.tab.cpp: kasa.y
 	bison -d -o $@ $^
-
-lex.cpp: kasa.l ast.h
-	flex --nounistd -o $@ $^ 
 
 kasa: $(OBJS)
 	$(CXX) -o $@ $(OBJS) $(CXXFLAGS)

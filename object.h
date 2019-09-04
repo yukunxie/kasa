@@ -6,6 +6,14 @@
 #include <iostream>
 #include "kasa_assert.h"
 
+// triats object type from C++ builtin types
+#define DECLARE_OBJECT_TYPE_TRIATS(PrimitiveType, Typename) \
+template<>                                                  \
+struct ObjectTypeTriats <PrimitiveType>                     \
+{                                                           \
+typedef Typename ObjectType;                                \
+};
+
 enum BuiltinType
 {
     TYPE_INT,
@@ -15,9 +23,19 @@ enum BuiltinType
     TYPE_COUNT
 };
 
+template<typename _Tp>
+struct ObjectTypeTriats
+{
+    typedef _Tp ObjectType;
+};
+
 class ObjectInteger;
 class ObjectDecimal;
 class ObjectString;
+
+DECLARE_OBJECT_TYPE_TRIATS(int, ObjectInteger)
+DECLARE_OBJECT_TYPE_TRIATS(double, ObjectDecimal)
+DECLARE_OBJECT_TYPE_TRIATS(std::string, ObjectString)
 
 std::ostream &operator<<(std::ostream &out, const ObjectInteger &obj);
 std::ostream &operator<<(std::ostream &out, const ObjectDecimal &obj);

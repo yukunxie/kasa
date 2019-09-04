@@ -1,8 +1,7 @@
-
-func my_func(a, b, c)
+func my_func(a, b)
 {  
-    a = 1 + b;
+    c = 1 + b;
+    return c, 5;
 }
-
 
 my_func(1, 2);

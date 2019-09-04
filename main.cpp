@@ -44,7 +44,7 @@ int main()
 
     // cout << a << " " << b << " " << i << " " << b.getType() << endl;
 
-    std::ifstream ifs("G:\\Realxie\\kasa\\test1.ks");
+    std::ifstream ifs("/Users/realxie/Desktop/Realxie/kasa/test1.ks");
     std::string content((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
 
 	std::cout << "code:" << content << std::endl;

@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include "ast.h"
 
-#ifdef UNIX
+#if defined(__APPLE__) || defined(__LINUX__)
 #include <unistd.h>
 #else
 #include <io.h>

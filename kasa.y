@@ -35,6 +35,7 @@
 	AST *ast;
 	ASTChunk *chunk;
 	ASTExpression *expr;
+	ASTReturnExpression *returnExpr;
 	ASTExpression *stmt;
 	ASTIdentifier *ident;
 	std::vector<ASTIdentifier*> *varvec;
@@ -62,7 +63,7 @@
    calling an (NIdentifier*). It makes the compiler happy.
  */
 %type <ident> ident
-%type <expr> numeric expr id_or_expr ex_expr
+%type <expr> numeric expr id_or_expr ex_expr return_expr return_expr_param
 %type <varvec> func_decl_args
 %type <exprvec> call_args
 %type <chunk> program stmts chunk
@@ -110,12 +111,20 @@ numeric : TINTEGER { $$ = new ASTInteger(atoi($1->c_str())); delete $1; }
 		;
 
 ex_expr: ident TEQUAL id_or_expr { $$ = new ASTAssignment($<ident>1, $3); }
+		| return_expr {$$ = $1;}
 		| expr {$$ = $1;}
 		;
 
 id_or_expr : expr { $$ = $1; }
 		| ident  { $$ = $1; }
 		;
+
+return_expr: TRETURN return_expr_param{$$ = $2;}
+
+return_expr_param : /**/ {$$ = new ASTReturnExpression();}
+		| id_or_expr {$$ = new ASTReturnExpression();((ASTReturnExpression*)$$)->appendExrepssion($1);}
+		| return_expr_param TCOMMA id_or_expr {((ASTReturnExpression*)$1)->appendExrepssion($3)}
+
 
 expr :    numeric { $$ = $1; }
         | id_or_expr TMUL id_or_expr { $$ = new ASTBinaryOp($2, $1, $3); }
