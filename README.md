@@ -11,5 +11,11 @@
     bison -h
 
 # generate
-    make 
+    chmod +x build.sh
+    ./build.sh
+
+# run example  
     ./kasa
+
+# clean
+    make clean
