@@ -1,3 +1,11 @@
+/* @Copyright (c) 2019 by Yukun Xie
+ *
+ * ./object.h
+ *
+ * This file is part of the "KASA" project (Copyright (c) 2019 by Yukun Xie)
+ * See "LICENSE.txt" for license information.
+ */
+
 #ifndef __OBJECT_H__
 #define __OBJECT_H__
 
@@ -9,7 +17,7 @@
 // triats object type from C++ builtin types
 #define DECLARE_OBJECT_TYPE_TRIATS(PrimitiveType, Typename) \
 template<>                                                  \
-struct ObjectTypeTriats <PrimitiveType>                     \
+struct ObjectTypeTraits <PrimitiveType>                     \
 {                                                           \
 typedef Typename ObjectType;                                \
 };
@@ -24,7 +32,7 @@ enum BuiltinType
 };
 
 template<typename _Tp>
-struct ObjectTypeTriats
+struct ObjectTypeTraits
 {
     typedef _Tp ObjectType;
 };

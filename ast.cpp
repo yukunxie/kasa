@@ -1,3 +1,11 @@
+/* @Copyright (c) 2019 by Yukun Xie
+ *
+ * ./ast.cpp
+ *
+ * This file is part of the "KASA" project (Copyright (c) 2019 by Yukun Xie)
+ * See "LICENSE.txt" for license information.
+ */
+
 #include "ast.h"
 #include "interpreter.h"
 #include "kasa.tab.hpp"

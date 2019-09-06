@@ -1,3 +1,11 @@
+/* @Copyright (c) 2019 by Yukun Xie
+ *
+ * ./interpreter.h
+ *
+ * This file is part of the "KASA" project (Copyright (c) 2019 by Yukun Xie)
+ * See "LICENSE.txt" for license information.
+ */
+
 #ifndef __INTERPRETER_H__
 #define __INTERPRETER_H__
 

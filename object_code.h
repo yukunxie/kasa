@@ -1,3 +1,11 @@
+/* @Copyright (c) 2019 by Yukun Xie
+ *
+ * ./object_code.h
+ *
+ * This file is part of the "KASA" project (Copyright (c) 2019 by Yukun Xie)
+ * See "LICENSE.txt" for license information.
+ */
+
 #ifndef __OBJECT_CODE_H__
 #define __OBJECT_CODE_H__
 

@@ -1,3 +1,11 @@
+/* @Copyright (c) 2019 by Yukun Xie
+ *
+ * ./lex.cpp
+ *
+ * This file is part of the "KASA" project (Copyright (c) 2019 by Yukun Xie)
+ * See "LICENSE.txt" for license information.
+ */
+
 #line 2 "lex.cpp"
 
 #line 4 "lex.cpp"

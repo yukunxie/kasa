@@ -1,24 +1,32 @@
+/* @Copyright (c) 2019 by Yukun Xie
+ *
+ * ./interpreter.cpp
+ *
+ * This file is part of the "KASA" project (Copyright (c) 2019 by Yukun Xie)
+ * See "LICENSE.txt" for license information.
+ */
+
 #include <iostream>
 
 #include "interpreter.h"
 #include "opcode.h"
-
-#define DECLARE_BINARY_OP_TEMPLATE(Op)                              \
-template<typename _Tp1, typename _Tp2>                              \
-decltype(auto) operator Op(const _Tp1&a, const _Tp2& b)              \
-{                                                                   \
-    auto value = a.getValue() Op b.getValue();                       \
-    return CreateObjectHelper<decltype(value)>::createObject(value);\
-}
 
 template<typename _Tp>
 struct CreateObjectHelper
 {
     static Object* createObject(const _Tp& value)
     {
-        return new (typename ObjectTypeTriats<_Tp>::ObjectType)(value);
+        return new (typename ObjectTypeTraits<_Tp>::ObjectType)(value);
     }
 };
+
+#define DECLARE_BINARY_OP_TEMPLATE(Op)                              \
+template<typename _Tp1, typename _Tp2>                              \
+decltype(auto) operator Op(const _Tp1&a, const _Tp2& b)             \
+{                                                                   \
+auto value = a.getValue() Op b.getValue();                          \
+return CreateObjectHelper<decltype(value)>::createObject(value);    \
+}
 
 // declare binary opertion on objects.
 DECLARE_BINARY_OP_TEMPLATE(+)

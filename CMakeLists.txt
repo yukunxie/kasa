@@ -13,6 +13,7 @@ set(SRC_LIST
     main.cpp
     object_code.cpp
     object.cpp
+    global_stack.cpp
     
     ast.h
     interpreter.h
@@ -22,6 +23,7 @@ set(SRC_LIST
     object_code.h
     object.h
     opcode.h
+    global_stack.h
 )
 
 add_executable(Kasa ${SRC_LIST} )
